@@ -47,6 +47,10 @@ function isPreloadable(linkElement) {
     return false
   }
 
+  if ('noInstant' in linkElement.dataset) {
+    return false
+  }
+
   return true
 }
 
