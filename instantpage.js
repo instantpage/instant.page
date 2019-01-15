@@ -47,6 +47,10 @@ function isPreloadable(linkElement) {
     return false
   }
 
+  if (urlObject.pathname + urlObject.search == location.pathname + location.search && urlObject.hash) {
+    return
+  }
+
   if ('noInstant' in linkElement.dataset) {
     return false
   }
