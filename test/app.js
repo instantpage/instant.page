@@ -48,14 +48,14 @@ async function requestListener(req, res) {
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
-        content += `<a href="/${i}?${Math.random()}">Page ${i}</a>`
+        content += `<a href="/${i}?${Math.random()}"><span>Page ${i}</span></a>`
       }
     }
 
-    content += `<a href="${req.url}#anchor" id="anchor">Same-page anchor</a>`
-    content += `<a href="/${page}?${Math.random()}#anchor">Other page anchor</a>`
-    content += `<a href="/${page}?${Math.random()}" data-instant="no">Manually blacklisted link</a>`
-    content += `<a href="https://www.google.com/">External link</a>`
+    content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
+    content += `<a href="/${page}?${Math.random()}#anchor"><span>Other page anchor</span></a>`
+    content += `<a href="/${page}?${Math.random()}" data-instant="no"><span>Manually blacklisted link</span></a>`
+    content += `<a href="https://www.google.com/"><span>External link</span></a>`
 
     let footer = await fsPromises.readFile(path.resolve(__dirname, 'footer.html'))
     footer = footer.toString().replace('__HASH__', jsHash)
