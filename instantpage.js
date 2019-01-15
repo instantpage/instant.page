@@ -36,6 +36,13 @@ function preload(url) {
   if (urlBeingPreloaded == url) {
     return
   }
+
+  const urlObject = new URL(url)
+
+  if (urlObject.origin != location.origin) {
+    return
+  }
+
   urlBeingPreloaded = url
 
   if (!useAjaxFallback) {
@@ -48,6 +55,9 @@ function preload(url) {
 }
 
 function stopPreloading() {
+  if (!urlBeingPreloaded) {
+    return
+  }
   urlBeingPreloaded = undefined
 
   if (!useAjaxFallback) {
