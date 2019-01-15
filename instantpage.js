@@ -19,6 +19,10 @@ function mouseoverListener(event) {
     return
   }
 
+  if (!isPreloadable(linkElement)) {
+    return
+  }
+
   linkElement.addEventListener('mouseout', mouseoutListener)
 
   preload(linkElement.href)
@@ -32,17 +36,21 @@ function mouseoutListener(event) {
   stopPreloading()
 }
 
-function preload(url) {
-  if (urlBeingPreloaded == url) {
-    return
+function isPreloadable(linkElement) {
+  if (urlBeingPreloaded == linkElement.href) {
+    return false
   }
 
-  const urlObject = new URL(url)
+  const urlObject = new URL(linkElement.href)
 
   if (urlObject.origin != location.origin) {
-    return
+    return false
   }
 
+  return true
+}
+
+function preload(url) {
   urlBeingPreloaded = url
 
   if (!useAjaxFallback) {
