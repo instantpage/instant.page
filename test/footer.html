@@ -1,0 +1,23 @@
+<button>Test</button>
+
+<script>
+let start
+let lastTouchTimestamp = 0
+const button = document.querySelector('button')
+button.addEventListener('touchstart', () => {
+  start = +new Date
+  lastTouchTimestamp = start
+})
+
+button.addEventListener('mouseover', () => {
+  if ((+new Date - lastTouchTimestamp) > 1000) {
+    start = +new Date
+  }
+})
+
+button.addEventListener('click', () => {
+  button.innerText = '>>> ' + (+new Date - start) + ' <<<'
+  start = undefined
+})
+</script>
+<script src="/instantpage.js" type="module" integrity="sha384-__HASH__"></script>
