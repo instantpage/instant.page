@@ -60,6 +60,7 @@ async function requestListener(req, res) {
       }
     }
 
+    content += `<a href="/${page}?${Math.random()}" target="_blank"><span>Opens in a new tab</span></a>`
     content += `<a href="/${page}?${Math.random()}#anchor"><span>Other page anchor</span></a>`
     content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
     content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
