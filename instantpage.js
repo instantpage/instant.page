@@ -1,6 +1,7 @@
 /*! instant.page v0.0.0 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
 
 let urlBeingPreloaded
+let mouseoverTimer
 
 const prefetcher = document.createElement('link')
 const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
@@ -25,7 +26,7 @@ function mouseoverListener(event) {
 
   linkElement.addEventListener('mouseout', mouseoutListener)
 
-  preload(linkElement.href)
+  mouseoverTimer = setTimeout(preload, 65, linkElement.href)
 }
 
 function mouseoutListener(event) {
@@ -65,6 +66,11 @@ function preload(url) {
 }
 
 function stopPreloading() {
+  if (mouseoverTimer) {
+    clearTimeout(mouseoverTimer)
+    mouseoverTimer = undefined
+  }
+
   if (!urlBeingPreloaded) {
     return
   }
