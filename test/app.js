@@ -26,8 +26,6 @@ function sha384(data) {
 }
 
 async function requestListener(req, res) {
-  await sleep(SLEEP_TIME)
-
   let headers = {
     'Content-Type': 'text/html',
   }
@@ -48,6 +46,8 @@ async function requestListener(req, res) {
     content += jsContent
   }
   else if (!isNaN(page)) {
+    await sleep(SLEEP_TIME)
+
     if (CACHE_MAX_AGE) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
