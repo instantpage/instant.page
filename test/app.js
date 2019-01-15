@@ -10,7 +10,11 @@ let SLEEP_TIME = parseInt(process.argv[argvIndexOfFile + 1])
 if (isNaN(SLEEP_TIME)) {
   SLEEP_TIME = 200
 }
-let PORT = parseInt(process.argv[argvIndexOfFile + 2])
+let CACHE_MAX_AGE = parseInt(process.argv[argvIndexOfFile + 2])
+if (isNaN(CACHE_MAX_AGE)) {
+  CACHE_MAX_AGE = 0
+}
+let PORT = parseInt(process.argv[argvIndexOfFile + 3])
 if (isNaN(PORT)) {
   PORT = 8000
 }
@@ -44,6 +48,10 @@ async function requestListener(req, res) {
     content += jsContent
   }
   else if (!isNaN(page)) {
+    if (CACHE_MAX_AGE) {
+      headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
+    }
+
     content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
