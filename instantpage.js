@@ -10,7 +10,10 @@ if (isSupported) {
   prefetcher.rel = 'prefetch'
   document.head.appendChild(prefetcher)
 
-  document.addEventListener('mouseover', mouseoverListener, true)
+  document.addEventListener('mouseover', mouseoverListener, {
+    capture: true,
+    passive: true,
+  })
 }
 
 function mouseoverListener(event) {
