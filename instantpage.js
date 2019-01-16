@@ -27,7 +27,7 @@ function mouseoverListener(event) {
     return
   }
 
-  linkElement.addEventListener('mouseout', mouseoutListener)
+  linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
   urlToPreload = linkElement.href
 
