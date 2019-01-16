@@ -88,13 +88,13 @@ function mouseoutListener(event) {
 
 function isPreloadable(linkElement) {
   if (urlToPreload == linkElement.href) {
-    return false
+    return
   }
 
   const urlObject = new URL(linkElement.href)
 
   if (urlObject.origin != location.origin) {
-    return false
+    return
   }
 
   if (urlObject.pathname + urlObject.search == location.pathname + location.search && urlObject.hash) {
@@ -102,7 +102,7 @@ function isPreloadable(linkElement) {
   }
 
   if ('noInstant' in linkElement.dataset) {
-    return false
+    return
   }
 
   return true
