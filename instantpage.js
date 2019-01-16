@@ -1,6 +1,6 @@
 /*! instant.page v0.0.0 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
 
-let urlBeingPreloaded
+let urlToPreload
 let mouseoverTimer
 
 const prefetcher = document.createElement('link')
@@ -26,7 +26,12 @@ function mouseoverListener(event) {
 
   linkElement.addEventListener('mouseout', mouseoutListener)
 
-  mouseoverTimer = setTimeout(preload, 65, linkElement.href)
+  urlToPreload = linkElement.href
+
+  mouseoverTimer = setTimeout(() => {
+    preload(linkElement.href)
+    mouseoverTimer = undefined
+  }, 65)
 }
 
 function mouseoutListener(event) {
@@ -34,11 +39,18 @@ function mouseoutListener(event) {
     return
   }
 
-  stopPreloading()
+  if (mouseoverTimer) {
+    clearTimeout(mouseoverTimer)
+    mouseoverTimer = undefined
+  }
+  else {
+    urlToPreload = undefined
+    stopPreloading()
+  }
 }
 
 function isPreloadable(linkElement) {
-  if (urlBeingPreloaded == linkElement.href) {
+  if (urlToPreload == linkElement.href) {
     return false
   }
 
@@ -60,22 +72,10 @@ function isPreloadable(linkElement) {
 }
 
 function preload(url) {
-  urlBeingPreloaded = url
-
   prefetcher.href = url
 }
 
 function stopPreloading() {
-  if (mouseoverTimer) {
-    clearTimeout(mouseoverTimer)
-    mouseoverTimer = undefined
-  }
-
-  if (!urlBeingPreloaded) {
-    return
-  }
-  urlBeingPreloaded = undefined
-
   /* The spec says an empty string should abort the prefetching
   * but Firefox 64 interprets it as a relative URL to prefetch. */
   prefetcher.removeAttribute('href')
