@@ -1,6 +1,6 @@
 {
   "name": "instant.page",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Make your site’s pages instant in 1 minute and improve your conversion rate by 1%",
   "main": "instantpage.js",
   "directories": {
