@@ -1,0 +1,26 @@
+{
+  "name": "instant.page",
+  "version": "0.0.0",
+  "description": "Make your site’s pages instant in 1 minute and improve your conversion rate by 1%",
+  "main": "instantpage.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/instantpage/instant.page.git"
+  },
+  "keywords": [
+    "instant",
+    "performance"
+  ],
+  "author": "Alexandre Dieulot",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/instantpage/instant.page/issues"
+  },
+  "homepage": "https://instant.page/"
+}
