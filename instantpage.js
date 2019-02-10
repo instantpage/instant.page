@@ -102,7 +102,7 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (urlObject.pathname + urlObject.search == location.pathname + location.search && urlObject.hash) {
+  if (urlObject.hash && urlObject.pathname + urlObject.search == location.pathname + location.search) {
     return
   }
 
