@@ -6,15 +6,19 @@ const crypto = require('crypto')
 const sleep = require('util').promisify(setTimeout)
 
 const argvIndexOfFile = process.argv.indexOf(__filename)
-let SLEEP_TIME = parseInt(process.argv[argvIndexOfFile + 1])
+let DATA_INSTANT = parseInt(process.argv[argvIndexOfFile + 1])
+if (isNaN(DATA_INSTANT)) {
+  DATA_INSTANT = 0
+}
+let SLEEP_TIME = parseInt(process.argv[argvIndexOfFile + 2])
 if (isNaN(SLEEP_TIME)) {
   SLEEP_TIME = 200
 }
-let CACHE_MAX_AGE = parseInt(process.argv[argvIndexOfFile + 2])
+let CACHE_MAX_AGE = parseInt(process.argv[argvIndexOfFile + 3])
 if (isNaN(CACHE_MAX_AGE)) {
   CACHE_MAX_AGE = 0
 }
-let PORT = parseInt(process.argv[argvIndexOfFile + 3])
+let PORT = parseInt(process.argv[argvIndexOfFile + 4])
 if (isNaN(PORT)) {
   PORT = 8000
 }
@@ -52,16 +56,24 @@ async function requestListener(req, res) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
 
+    if (DATA_INSTANT) {
+      content += `<body>`
+    }
+    else {
+      content += `<body data-instant-allow-query-string>`
+    }
+    dataInstantAttribute = DATA_INSTANT ? `data-instant` : ``
+
     content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
-        content += `<a href="/${i}?${Math.random()}"><span>Page ${i}</span></a>`
+        content += `<a href="/${i}?${Math.random()}" ${dataInstantAttribute}><span>Page ${i}</span></a>`
       }
     }
 
-    content += `<a href="/${page}?${Math.random()}" target="_blank"><span>Opens in a new tab</span></a>`
-    content += `<a href="/${page}?${Math.random()}#anchor"><span>Other page anchor</span></a>`
+    content += `<a href="/${page}?${Math.random()}" target="_blank" ${dataInstantAttribute}><span>Opens in a new tab</span></a>`
+    content += `<a href="/${page}?${Math.random()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
     content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
     content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
     content += `<a href="https://www.google.com/"><span>External link</span></a>`

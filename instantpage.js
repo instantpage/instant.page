@@ -98,7 +98,7 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (!allowQueryString && urlObject.search) {
+  if (!allowQueryString && urlObject.search && !('instant' in linkElement.dataset)) {
     return
   }
 
