@@ -91,6 +91,10 @@ function isPreloadable(linkElement) {
   if (urlToPreload == linkElement.href) {
     return
   }
+  
+  if(!linkElement.href || linkElement.href.length == 0 ||  linkElement.href == '#') {
+    return
+  }
 
   const urlObject = new URL(linkElement.href)
 
