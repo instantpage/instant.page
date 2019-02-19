@@ -60,7 +60,7 @@ async function requestListener(req, res) {
       content += `<body>`
     }
     else {
-      content += `<body data-instant-allow-query-string>`
+      content += `<body data-instant-allow-query-string data-instant-allow-external-links >`
     }
     dataInstantAttribute = DATA_INSTANT ? `data-instant` : ``
 
