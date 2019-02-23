@@ -79,6 +79,7 @@ async function requestListener(req, res) {
     content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
     content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
+    content += `<a href="file:///C:/"><span>file: link</span></a>`
 
     let footer = await fsPromises.readFile(path.resolve(__dirname, 'footer.html'))
     footer = footer.toString().replace('__HASH__', jsHash)

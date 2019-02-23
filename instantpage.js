@@ -103,6 +103,10 @@ function isPreloadable(linkElement) {
     return
   }
 
+  if (urlObject.protocol != 'https:' || (urlObject.protocol == 'http:' && location.protocol == 'https:')) {
+    return
+  }
+
   if (!allowQueryString && urlObject.search && !('instant' in linkElement.dataset)) {
     return
   }
