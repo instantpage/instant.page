@@ -1,4 +1,4 @@
-/*! instant.page v1.1.1 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
+/*! instant.page v1.2.0 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
 
 let urlToPreload
 let mouseoverTimer
