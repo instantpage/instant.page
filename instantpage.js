@@ -99,7 +99,7 @@ function isPreloadable(linkElement) {
 
   const urlObject = new URL(linkElement.href)
 
-  if (!allowExternalLinks && urlObject.origin != location.origin) {
+  if (!allowExternalLinks && urlObject.origin != location.origin && !('instant' in linkElement.dataset)) {
     return
   }
 

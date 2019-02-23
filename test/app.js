@@ -77,7 +77,7 @@ async function requestListener(req, res) {
     content += `<a href="/${page}?${Math.random()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
     content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
     content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
-    content += `<a href="https://www.google.com/"><span>External link</span></a>`
+    content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
 
     let footer = await fsPromises.readFile(path.resolve(__dirname, 'footer.html'))
