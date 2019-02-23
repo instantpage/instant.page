@@ -56,6 +56,8 @@ async function requestListener(req, res) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
 
+    content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
+
     if (DATA_INSTANT) {
       content += `<body>`
     }
@@ -64,7 +66,6 @@ async function requestListener(req, res) {
     }
     dataInstantAttribute = DATA_INSTANT ? `data-instant` : ``
 
-    content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
