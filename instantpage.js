@@ -7,6 +7,7 @@ let lastTouchTimestamp
 const prefetcher = document.createElement('link')
 const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
+const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 
 if (isSupported) {
   prefetcher.rel = 'prefetch'
@@ -98,7 +99,7 @@ function isPreloadable(linkElement) {
 
   const urlObject = new URL(linkElement.href)
 
-  if (urlObject.origin != location.origin) {
+  if (!allowExternalLinks && urlObject.origin != location.origin) {
     return
   }
 
