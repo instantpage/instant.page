@@ -28,10 +28,6 @@ function touchstartListener(event) {
 
   const linkElement = event.target.closest('a')
 
-  if (!linkElement) {
-    return
-  }
-
   if (!isPreloadable(linkElement)) {
     return
   }
@@ -54,10 +50,6 @@ function mouseoverListener(event) {
   }
 
   const linkElement = event.target.closest('a')
-
-  if (!linkElement) {
-    return
-  }
 
   if (!isPreloadable(linkElement)) {
     return
@@ -89,6 +81,10 @@ function mouseoutListener(event) {
 }
 
 function isPreloadable(linkElement) {
+  if (!linkElement) {
+    return
+  }
+
   if (!linkElement.href) {
     return
   }
