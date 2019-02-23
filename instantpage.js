@@ -88,6 +88,10 @@ function mouseoutListener(event) {
 }
 
 function isPreloadable(linkElement) {
+  if (!linkElement.href) {
+    return
+  }
+
   if (urlToPreload == linkElement.href) {
     return
   }
