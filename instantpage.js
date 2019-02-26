@@ -99,7 +99,11 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (urlObject.protocol != 'https:' || (urlObject.protocol == 'http:' && location.protocol == 'https:')) {
+  if (!['http:', 'https:'].includes(urlObject.protocol)) {
+    return
+  }
+
+  if (urlObject.protocol == 'http:' && location.protocol == 'https:') {
     return
   }
 
