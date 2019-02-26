@@ -81,11 +81,7 @@ function mouseoutListener(event) {
 }
 
 function isPreloadable(linkElement) {
-  if (!linkElement) {
-    return
-  }
-
-  if (!linkElement.href) {
+  if (!linkElement || !linkElement.href) {
     return
   }
 
