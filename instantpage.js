@@ -115,6 +115,16 @@ function isPreloadable(linkElement) {
     return
   }
 
+  if (navigator.connection) {
+    const conn = navigator.connection;
+    if (conn.saveData) {
+      return
+    }
+    if(conn.effectiveType && (conn.effectiveType === "2g" || conn.effectiveType === "slow-2g")) {
+      return
+    }
+  }
+
   return true
 }
 
