@@ -8,6 +8,7 @@ const prefetcher = document.createElement('link')
 const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
+const whitelistModeEnabled = 'instantWhitelistMode' in document.body.dataset
 
 if (isSupported) {
   prefetcher.rel = 'prefetch'
@@ -86,6 +87,10 @@ function isPreloadable(linkElement) {
   }
 
   if (urlToPreload == linkElement.href) {
+    return
+  }
+
+  if (whitelistModeEnabled && !('instant' in linkElement.dataset)) {
     return
   }
 
