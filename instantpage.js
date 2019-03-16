@@ -124,7 +124,5 @@ function preload(url) {
 }
 
 function stopPreloading() {
-  /* The spec says an empty string should abort the prefetching
-  * but Firefox 64 interprets it as a relative URL to prefetch. */
   prefetcher.removeAttribute('href')
 }
