@@ -6,10 +6,11 @@ let lastTouchTimestamp
 
 const prefetcher = document.createElement('link')
 const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
+const isDataSaverEnabled = navigator.connection && navigator.connection.saveData
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 
-if (isSupported) {
+if (isSupported && !isDataSaverEnabled) {
   prefetcher.rel = 'prefetch'
   document.head.appendChild(prefetcher)
 
