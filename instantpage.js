@@ -67,7 +67,7 @@ function mouseoverListener(event) {
 }
 
 function mouseoutListener(event) {
-  if (event.relatedTarget && event.target.closest('a') == event.relatedTarget.closest('a')) {
+  if (event.relatedTarget && event.target.closest('a') === event.relatedTarget.closest('a')) {
     return
   }
 
@@ -86,13 +86,13 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (urlToPreload == linkElement.href) {
+  if (urlToPreload === linkElement.href) {
     return
   }
 
   const preloadLocation = new URL(linkElement.href)
 
-  if (!allowExternalLinks && preloadLocation.origin != location.origin && !('instant' in linkElement.dataset)) {
+  if (!allowExternalLinks && preloadLocation.origin !== location.origin && !('instant' in linkElement.dataset)) {
     return
   }
 
@@ -100,7 +100,7 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (preloadLocation.protocol == 'http:' && location.protocol == 'https:') {
+  if (preloadLocation.protocol === 'http:' && location.protocol === 'https:') {
     return
   }
 
@@ -108,7 +108,7 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (preloadLocation.hash && preloadLocation.pathname + preloadLocation.search == location.pathname + location.search) {
+  if (preloadLocation.hash && preloadLocation.pathname + preloadLocation.search === location.pathname + location.search) {
     return
   }
 
