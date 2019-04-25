@@ -90,6 +90,10 @@ function isPreloadable(linkElement) {
     return
   }
 
+  if ('noInstant' in linkElement.dataset) {
+    return
+  }
+
   if (urlToPreload === linkElement.href) {
     return
   }
@@ -113,10 +117,6 @@ function isPreloadable(linkElement) {
   }
 
   if (preloadLocation.hash && preloadLocation.pathname + preloadLocation.search === location.pathname + location.search) {
-    return
-  }
-
-  if ('noInstant' in linkElement.dataset) {
     return
   }
 
