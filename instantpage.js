@@ -86,6 +86,10 @@ function isPreloadable(linkElement) {
     return
   }
 
+  if (linkElement.href.indexOf('#') === 0) {
+    return
+  }
+
   if (urlToPreload === linkElement.href) {
     return
   }
