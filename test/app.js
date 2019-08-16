@@ -108,3 +108,4 @@ async function requestListener(req, res) {
 }
 
 http.createServer(requestListener).listen(PORT)
+console.log(`-> Running on http://127.0.0.1:${PORT}/`)
