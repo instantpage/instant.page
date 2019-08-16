@@ -6,21 +6,34 @@ const crypto = require('crypto')
 const sleep = require('util').promisify(setTimeout)
 
 const argvIndexOfFile = process.argv.indexOf(__filename)
-let DATA_INSTANT = parseInt(process.argv[argvIndexOfFile + 1])
-if (isNaN(DATA_INSTANT)) {
-  DATA_INSTANT = 0
-}
-let SLEEP_TIME = parseInt(process.argv[argvIndexOfFile + 2])
-if (isNaN(SLEEP_TIME)) {
-  SLEEP_TIME = 200
-}
-let CACHE_MAX_AGE = parseInt(process.argv[argvIndexOfFile + 3])
-if (isNaN(CACHE_MAX_AGE)) {
-  CACHE_MAX_AGE = 0
-}
-let PORT = parseInt(process.argv[argvIndexOfFile + 4])
+let PORT = parseInt(process.argv[argvIndexOfFile + 1])
 if (isNaN(PORT)) {
   PORT = 8000
+}
+
+let DATA_INSTANT = 0
+let SLEEP_TIME = 200
+let CACHE_MAX_AGE = 0
+
+function handleCookies(req) {
+  const cookies = req.headers.cookie
+
+  if (!cookies) {
+    return
+  }
+
+  cookies.split('; ').map((cookie) => {
+    const [key, value] = cookie.split('=')
+
+    if (key != 'instantpage_test') {
+      return
+    }
+
+    const cookieValueSplit = value.split(',').map((param) => parseInt(param))
+    DATA_INSTANT = cookieValueSplit[0]
+    SLEEP_TIME = cookieValueSplit[1]
+    CACHE_MAX_AGE = cookieValueSplit[2]
+  })
 }
 
 function sha384(data) {
@@ -50,6 +63,8 @@ async function requestListener(req, res) {
     content += jsContent
   }
   else if (!isNaN(page)) {
+    handleCookies(req)
+
     await sleep(SLEEP_TIME)
 
     if (CACHE_MAX_AGE) {
@@ -58,13 +73,14 @@ async function requestListener(req, res) {
 
     content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
 
-    if (DATA_INSTANT) {
-      content += `<body>`
-    }
-    else {
-      content += `<body data-instant-allow-query-string data-instant-allow-external-links >`
+    if (!DATA_INSTANT) {
+      content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links >')
     }
     dataInstantAttribute = DATA_INSTANT ? `data-instant` : ``
+
+    content = content.replace(':checked_aqsael', DATA_INSTANT ? 'checked' : '')
+    content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
+    content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {

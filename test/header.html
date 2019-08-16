@@ -27,4 +27,45 @@ a:hover {
 a:active {
   background: hsla(0, 0%, 0%, .25);
 }
+
+form {
+  background: hsla(0, 0%, 100%, .25);
+  border: 1px solid hsla(0, 0%, 0%, .15);
+}
+
+form label {
+  display: block;
+  padding: 5px;
+}
+
+@media (min-width: 900px) {
+  form label {
+    display: inline-block;
+    margin-right: 10px;
+  }
+}
+
+form input[type="number"] {
+  width: 50px;
+}
 </style>
+
+<body>
+
+<form>
+  <label>
+    Allow query string &amp; external links:
+    <input name="aqsael" type="checkbox" :checked_aqsael>
+  </label>
+  <label>
+    Sleep time:
+    <input name="sleep" type="number" :value_sleep>
+  </label>
+  <label>
+    Cache max age (in seconds):
+    <input name="cacheAge" type="number" :value_cacheAge>
+  </label>
+  <label>
+    <input type="submit" value="OK">
+  </label>
+</form>

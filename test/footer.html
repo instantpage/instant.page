@@ -1,6 +1,6 @@
 <button>Test</button>
 
-<script>
+<script type="module">
 let start
 let lastTouchTimestamp = 0
 const button = document.querySelector('button')
@@ -18,6 +18,19 @@ button.addEventListener('mouseover', () => {
 button.addEventListener('click', () => {
   button.innerText = '>>> ' + (+new Date - start) + ' <<<'
   start = undefined
+})
+</script>
+<script type="module">
+const form = document.forms[0]
+form.addEventListener('submit', (e) => {
+  e.preventDefault()
+  const cookieValue = [
+    form.aqsael.checked ? 1 : 0,
+    form.sleep.value,
+    form.cacheAge.value,
+  ].join(',')
+  document.cookie = `instantpage_test=${cookieValue}`
+  location.reload()
 })
 </script>
 <script src="/instantpage.js" type="module" integrity="sha384-__HASH__"></script>
