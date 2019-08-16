@@ -95,25 +95,23 @@ function isPreloadable(linkElement) {
     return
   }
 
-  const preloadLocation = new URL(linkElement.href)
-
-  if (!allowExternalLinks && preloadLocation.origin != location.origin && !('instant' in linkElement.dataset)) {
+  if (!allowExternalLinks && linkElement.origin != location.origin && !('instant' in linkElement.dataset)) {
     return
   }
 
-  if (!['http:', 'https:'].includes(preloadLocation.protocol)) {
+  if (!['http:', 'https:'].includes(linkElement.protocol)) {
     return
   }
 
-  if (preloadLocation.protocol == 'http:' && location.protocol == 'https:') {
+  if (linkElement.protocol == 'http:' && location.protocol == 'https:') {
     return
   }
 
-  if (!allowQueryString && preloadLocation.search && !('instant' in linkElement.dataset)) {
+  if (!allowQueryString && linkElement.search && !('instant' in linkElement.dataset)) {
     return
   }
 
-  if (preloadLocation.hash && preloadLocation.pathname + preloadLocation.search == location.pathname + location.search) {
+  if (linkElement.hash && linkElement.pathname + linkElement.search == location.pathname + location.search) {
     return
   }
 
