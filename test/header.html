@@ -38,7 +38,7 @@ form label {
   padding: 5px;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1000px) {
   form label {
     display: inline-block;
     margin-right: 10px;
@@ -56,6 +56,10 @@ form input[type="number"] {
   <label>
     Allow query string &amp; external links:
     <input name="aqsael" type="checkbox" :checked_aqsael>
+  </label>
+  <label>
+    Use whitelist:
+    <input name="whitelist" type="checkbox" :checked_whitelist>
   </label>
   <label>
     Sleep time:

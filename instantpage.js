@@ -9,6 +9,7 @@ const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetc
 const isDataSaverEnabled = navigator.connection && navigator.connection.saveData
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
+const useWhitelist = 'instantWhitelist' in document.body.dataset
 
 if (isSupported && !isDataSaverEnabled) {
   prefetcher.rel = 'prefetch'
@@ -87,6 +88,10 @@ function isPreloadable(linkElement) {
   }
 
   if (urlToPreload == linkElement.href) {
+    return
+  }
+
+  if (useWhitelist && !('instant' in linkElement.dataset)) {
     return
   }
 

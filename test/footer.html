@@ -28,6 +28,7 @@ form.addEventListener('submit', (e) => {
     form.aqsael.checked ? 1 : 0,
     form.sleep.value,
     form.cacheAge.value,
+    form.whitelist.checked ? 1 : 0,
   ].join(',')
   document.cookie = `instantpage_test=${cookieValue}`
   location.reload()

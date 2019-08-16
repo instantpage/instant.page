@@ -14,6 +14,7 @@ if (isNaN(PORT)) {
 let DATA_INSTANT = 0
 let SLEEP_TIME = 200
 let CACHE_MAX_AGE = 0
+let USE_WHITELIST = 0
 
 function handleCookies(req) {
   const cookies = req.headers.cookie
@@ -33,6 +34,7 @@ function handleCookies(req) {
     DATA_INSTANT = cookieValueSplit[0]
     SLEEP_TIME = cookieValueSplit[1]
     CACHE_MAX_AGE = cookieValueSplit[2]
+    USE_WHITELIST = cookieValueSplit[3]
   })
 }
 
@@ -74,11 +76,15 @@ async function requestListener(req, res) {
     content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
 
     if (!DATA_INSTANT) {
-      content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links >')
+      content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
     }
-    dataInstantAttribute = DATA_INSTANT ? `data-instant` : ``
+    if (USE_WHITELIST) {
+      content = content.replace('<body', '<body data-instant-whitelist')
+    }
+    dataInstantAttribute = DATA_INSTANT || USE_WHITELIST ? `data-instant` : ``
 
     content = content.replace(':checked_aqsael', DATA_INSTANT ? 'checked' : '')
+    content = content.replace(':checked_whitelist', USE_WHITELIST ? 'checked' : '')
     content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
     content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
 
@@ -93,6 +99,7 @@ async function requestListener(req, res) {
     content += `<a href="/${page}?${Math.random()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
     content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
     content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
+    content += `<a href="/${page}?${Math.random()}"><span>Non-whitelisted link</span></a>`
     content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
     content += `<a href="file:///C:/"><span>file: link</span></a>`
