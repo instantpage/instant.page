@@ -11,7 +11,7 @@ if (isNaN(PORT)) {
   PORT = 8000
 }
 
-let DATA_INSTANT = 0
+let ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS = 0
 let SLEEP_TIME = 200
 let CACHE_MAX_AGE = 0
 let USE_WHITELIST = 0
@@ -32,7 +32,7 @@ function handleCookies(req) {
     }
 
     const cookieValueSplit = value.split(',').map((param) => parseInt(param))
-    DATA_INSTANT = cookieValueSplit[0]
+    ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS = cookieValueSplit[0]
     SLEEP_TIME = cookieValueSplit[1]
     CACHE_MAX_AGE = cookieValueSplit[2]
     USE_WHITELIST = cookieValueSplit[3]
@@ -80,7 +80,7 @@ async function requestListener(req, res) {
 
     content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
 
-    if (!DATA_INSTANT) {
+    if (ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS) {
       content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
     }
     if (USE_WHITELIST) {
@@ -89,9 +89,9 @@ async function requestListener(req, res) {
     else if (INTENSITY != 65) {
       content = content.replace('<body', `<body data-instant-intensity="${INTENSITY}"`)
     }
-    dataInstantAttribute = DATA_INSTANT || USE_WHITELIST ? `data-instant` : ``
+    dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
 
-    content = content.replace(':checked_aqsael', DATA_INSTANT ? 'checked' : '')
+    content = content.replace(':checked_aqsael', ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS ? 'checked' : '')
     content = content.replace(':checked_whitelist', USE_WHITELIST ? 'checked' : '')
     content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
     content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
