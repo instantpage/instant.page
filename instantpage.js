@@ -11,6 +11,14 @@ const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
 
+let delayOnHover = 65
+if ('instantIntensity' in document.body.dataset) {
+  const milliseconds = parseInt(document.body.dataset.instantIntensity)
+  if (milliseconds != NaN) {
+    delayOnHover = milliseconds
+  }
+}
+
 if (isSupported && !isDataSaverEnabled) {
   prefetcher.rel = 'prefetch'
   document.head.appendChild(prefetcher)
@@ -64,7 +72,7 @@ function mouseoverListener(event) {
   mouseoverTimer = setTimeout(() => {
     preload(linkElement.href)
     mouseoverTimer = undefined
-  }, 65)
+  }, delayOnHover)
 }
 
 function mouseoutListener(event) {
