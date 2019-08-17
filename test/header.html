@@ -48,6 +48,10 @@ form label {
 form input[type="number"] {
   width: 50px;
 }
+
+form input[type="text"] {
+  width: 110px;
+}
 </style>
 
 <body>
@@ -66,8 +70,8 @@ form input[type="number"] {
     <input name="sleep" type="number" :value_sleep>
   </label>
   <label>
-    Delay on hover:
-    <input name="hoverDelay" type="number" :value_hoverDelay>
+    Intensity:
+    <input name="intensity" type="text" :value_intensity>
   </label>
   <label>
     Cache max age (in seconds):

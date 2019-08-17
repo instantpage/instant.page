@@ -12,10 +12,20 @@ const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
 
 let delayOnHover = 65
+let useMousedown = false
+let useMousedownOnly = false
 if ('instantIntensity' in document.body.dataset) {
-  const milliseconds = parseInt(document.body.dataset.instantIntensity)
-  if (milliseconds != NaN) {
-    delayOnHover = milliseconds
+  if (document.body.dataset.instantIntensity.substr(0, 'mousedown'.length) == 'mousedown') {
+    useMousedown = true
+    if (document.body.dataset.instantIntensity == 'mousedown-only') {
+      useMousedownOnly = true
+    }
+  }
+  else {
+    const milliseconds = parseInt(document.body.dataset.instantIntensity)
+    if (milliseconds != NaN) {
+      delayOnHover = milliseconds
+    }
   }
 }
 
@@ -27,8 +37,17 @@ if (isSupported && !isDataSaverEnabled) {
     capture: true,
     passive: true,
   }
-  document.addEventListener('touchstart', touchstartListener, eventListenersOptions)
-  document.addEventListener('mouseover', mouseoverListener, eventListenersOptions)
+
+  if (!useMousedownOnly) {
+    document.addEventListener('touchstart', touchstartListener, eventListenersOptions)
+  }
+
+  if (!useMousedown) {
+    document.addEventListener('mouseover', mouseoverListener, eventListenersOptions)
+  }
+  else {
+    document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
+  }
 }
 
 function touchstartListener(event) {
@@ -75,6 +94,20 @@ function mouseoverListener(event) {
   }, delayOnHover)
 }
 
+function mousedownListener(event) {
+  const linkElement = event.target.closest('a')
+
+  if (!isPreloadable(linkElement)) {
+    return
+  }
+
+  linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
+
+  urlToPreload = linkElement.href
+
+  preload(linkElement.href)
+}
+
 function mouseoutListener(event) {
   if (event.relatedTarget && event.target.closest('a') == event.relatedTarget.closest('a')) {
     return
@@ -84,10 +117,10 @@ function mouseoutListener(event) {
     clearTimeout(mouseoverTimer)
     mouseoverTimer = undefined
   }
-  else {
-    urlToPreload = undefined
-    stopPreloading()
-  }
+
+  urlToPreload = undefined
+
+  stopPreloading()
 }
 
 function isPreloadable(linkElement) {

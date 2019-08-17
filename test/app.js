@@ -15,7 +15,7 @@ let DATA_INSTANT = 0
 let SLEEP_TIME = 200
 let CACHE_MAX_AGE = 0
 let USE_WHITELIST = 0
-let HOVER_DELAY = 65
+let INTENSITY = 65
 
 function handleCookies(req) {
   const cookies = req.headers.cookie
@@ -36,7 +36,10 @@ function handleCookies(req) {
     SLEEP_TIME = cookieValueSplit[1]
     CACHE_MAX_AGE = cookieValueSplit[2]
     USE_WHITELIST = cookieValueSplit[3]
-    HOVER_DELAY = cookieValueSplit[4]
+    INTENSITY = cookieValueSplit[4]
+    if (isNaN(INTENSITY)) {
+      INTENSITY = value.split(',')[4]
+    }
   })
 }
 
@@ -83,8 +86,8 @@ async function requestListener(req, res) {
     if (USE_WHITELIST) {
       content = content.replace('<body', '<body data-instant-whitelist')
     }
-    if (HOVER_DELAY != 65) {
-      content = content.replace('<body', `<body data-instant-intensity="${HOVER_DELAY}"`)
+    else if (INTENSITY != 65) {
+      content = content.replace('<body', `<body data-instant-intensity="${INTENSITY}"`)
     }
     dataInstantAttribute = DATA_INSTANT || USE_WHITELIST ? `data-instant` : ``
 
@@ -92,7 +95,7 @@ async function requestListener(req, res) {
     content = content.replace(':checked_whitelist', USE_WHITELIST ? 'checked' : '')
     content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
     content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
-    content = content.replace(':value_hoverDelay', `value="${HOVER_DELAY}"`)
+    content = content.replace(':value_intensity', `value="${INTENSITY}"`)
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
