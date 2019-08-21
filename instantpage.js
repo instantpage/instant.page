@@ -88,7 +88,7 @@ function mouseoverListener(event) {
 
   urlToPreload = linkElement.href
 
-  mouseoverTimer = setTimeout(() => {
+  mouseoverTimer = setTimeout(function() {
     preload(linkElement.href)
     mouseoverTimer = undefined
   }, delayOnHover)
