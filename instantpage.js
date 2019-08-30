@@ -23,7 +23,7 @@ if ('instantIntensity' in document.body.dataset) {
   }
   else {
     const milliseconds = parseInt(document.body.dataset.instantIntensity)
-    if (milliseconds != NaN) {
+    if (!isNaN(milliseconds)) {
       delayOnHover = milliseconds
     }
   }
