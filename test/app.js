@@ -16,6 +16,7 @@ let SLEEP_TIME = 200
 let CACHE_MAX_AGE = 0
 let USE_WHITELIST = 0
 let INTENSITY = 65
+let USE_MINIFIED = 0
 
 function handleCookies(req) {
   const cookies = req.headers.cookie
@@ -40,6 +41,7 @@ function handleCookies(req) {
     if (isNaN(INTENSITY)) {
       INTENSITY = value.split(',')[4]
     }
+    USE_MINIFIED = cookieValueSplit[5]
   })
 }
 
@@ -50,6 +52,8 @@ function sha384(data) {
 }
 
 async function requestListener(req, res) {
+  handleCookies(req)
+
   let headers = {
     'Content-Type': 'text/html',
   }
@@ -62,7 +66,7 @@ async function requestListener(req, res) {
 
   let content = ''
 
-  const jsContent = await fsPromises.readFile(path.resolve(__dirname, '../instantpage.js'))
+  const jsContent = await fsPromises.readFile(path.resolve(__dirname, `../${USE_MINIFIED ? 'instantpage.min.js' : 'instantpage.js'}`))
   const jsHash = sha384(jsContent)
 
   if (pathString == 'instantpage.js') {
@@ -70,8 +74,6 @@ async function requestListener(req, res) {
     content += jsContent
   }
   else if (!isNaN(page)) {
-    handleCookies(req)
-
     await sleep(SLEEP_TIME)
 
     if (CACHE_MAX_AGE) {
@@ -96,6 +98,7 @@ async function requestListener(req, res) {
     content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
     content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
     content = content.replace(':value_intensity', `value="${INTENSITY}"`)
+    content = content.replace(':checked_minified', USE_MINIFIED ? 'checked' : '')
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {

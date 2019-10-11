@@ -15,3 +15,7 @@ With [Node](https://nodejs.org/), run:
 `node test/app.js`
 
 And access http://127.0.0.1:8000/. Or specify another port with an argument after the filename.
+
+## Minifying
+
+To minify instantpage.js into instantpage.min.js install uglify-es globally (`npm i uglify-es -g`) then run `npm run minify`.
