@@ -15,14 +15,16 @@ let delayOnHover = 65
 let useMousedown = false
 let useMousedownOnly = false
 if ('instantIntensity' in document.body.dataset) {
-  if (document.body.dataset.instantIntensity.substr(0, 'mousedown'.length) == 'mousedown') {
+  const intensity = document.body.dataset.instantIntensity
+
+  if (intensity.substr(0, 'mousedown'.length) == 'mousedown') {
     useMousedown = true
-    if (document.body.dataset.instantIntensity == 'mousedown-only') {
+    if (intensity == 'mousedown-only') {
       useMousedownOnly = true
     }
   }
   else {
-    const milliseconds = parseInt(document.body.dataset.instantIntensity)
+    const milliseconds = parseInt(intensity)
     if (!isNaN(milliseconds)) {
       delayOnHover = milliseconds
     }
