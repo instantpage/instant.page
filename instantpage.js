@@ -6,6 +6,7 @@ let lastTouchTimestamp
 
 const prefetcher = document.createElement('link')
 const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
+                    && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
 const isDataSaverEnabled = navigator.connection && navigator.connection.saveData
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
@@ -14,6 +15,7 @@ const useWhitelist = 'instantWhitelist' in document.body.dataset
 let delayOnHover = 65
 let useMousedown = false
 let useMousedownOnly = false
+let useViewport = false
 if ('instantIntensity' in document.body.dataset) {
   const intensity = document.body.dataset.instantIntensity
 
@@ -21,6 +23,14 @@ if ('instantIntensity' in document.body.dataset) {
     useMousedown = true
     if (intensity == 'mousedown-only') {
       useMousedownOnly = true
+    }
+  }
+  else if (intensity == 'viewport') {
+    /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
+     * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
+     * Note that the viewport (which we check here) is smaller than the resolution due to the UI’s chrome */
+    if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
+      useViewport = true
     }
   }
   else {
@@ -49,6 +59,40 @@ if (isSupported && !isDataSaverEnabled) {
   }
   else {
     document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
+  }
+
+  if (useViewport) {
+    let triggeringFunction
+    if (window.requestIdleCallback) {
+      triggeringFunction = (callback) => {
+        requestIdleCallback(callback, {
+          timeout: 1500,
+        })
+      }
+    }
+    else {
+      triggeringFunction = (callback) => {
+        callback()
+      }
+    }
+
+    triggeringFunction(() => {
+      const intersectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const linkElement = entry.target
+            intersectionObserver.unobserve(linkElement)
+            preload(linkElement.href, true)
+          }
+        })
+      })
+
+      document.querySelectorAll('a').forEach((linkElement) => {
+        if (isPreloadable(linkElement)) {
+          intersectionObserver.observe(linkElement)
+        }
+      })
+    })
   }
 }
 
@@ -165,8 +209,16 @@ function isPreloadable(linkElement) {
   return true
 }
 
-function preload(url) {
-  prefetcher.href = url
+function preload(url, isFromViewport) {
+  if (!isFromViewport) {
+    prefetcher.href = url
+  }
+  else {
+    const additionalPrefetcher = document.createElement('link')
+    additionalPrefetcher.rel = 'prefetch'
+    additionalPrefetcher.href = url
+    document.head.appendChild(additionalPrefetcher)
+  }
 }
 
 function stopPreloading() {
