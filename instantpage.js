@@ -132,8 +132,6 @@ function mousedownListener(event) {
     return
   }
 
-  linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
-
   preload(linkElement.href)
 }
 
