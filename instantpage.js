@@ -2,7 +2,7 @@
 
 let mouseoverTimer
 let lastTouchTimestamp
-
+const prefetches = new Set()
 const prefetchElement = document.createElement('link')
 const isSupported = prefetchElement.relList && prefetchElement.relList.supports && prefetchElement.relList.supports('prefetch')
                     && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
@@ -185,8 +185,14 @@ function isPreloadable(linkElement) {
 }
 
 function preload(url) {
+  if (prefetches.has(url)) {
+    return
+  }
+
   const prefetcher = document.createElement('link')
   prefetcher.rel = 'prefetch'
   prefetcher.href = url
   document.head.appendChild(prefetcher)
+
+  prefetches.add(url)
 }
