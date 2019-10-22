@@ -1,11 +1,10 @@
 /*! instant.page v2.0.1 - (C) 2019 Alexandre Dieulot - https://instant.page/license */
 
-let urlToPreload
 let mouseoverTimer
 let lastTouchTimestamp
 
-const prefetcher = document.createElement('link')
-const isSupported = prefetcher.relList && prefetcher.relList.supports && prefetcher.relList.supports('prefetch')
+const prefetchElement = document.createElement('link')
+const isSupported = prefetchElement.relList && prefetchElement.relList.supports && prefetchElement.relList.supports('prefetch')
                     && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
 const isDataSaverEnabled = navigator.connection && navigator.connection.saveData
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
@@ -42,9 +41,6 @@ if ('instantIntensity' in document.body.dataset) {
 }
 
 if (isSupported && !isDataSaverEnabled) {
-  prefetcher.rel = 'prefetch'
-  document.head.appendChild(prefetcher)
-
   const eventListenersOptions = {
     capture: true,
     passive: true,
@@ -82,7 +78,7 @@ if (isSupported && !isDataSaverEnabled) {
           if (entry.isIntersecting) {
             const linkElement = entry.target
             intersectionObserver.unobserve(linkElement)
-            preload(linkElement.href, true)
+            preload(linkElement.href)
           }
         })
       })
@@ -107,16 +103,7 @@ function touchstartListener(event) {
     return
   }
 
-  linkElement.addEventListener('touchcancel', touchendAndTouchcancelListener, {passive: true})
-  linkElement.addEventListener('touchend', touchendAndTouchcancelListener, {passive: true})
-
-  urlToPreload = linkElement.href
   preload(linkElement.href)
-}
-
-function touchendAndTouchcancelListener() {
-  urlToPreload = undefined
-  stopPreloading()
 }
 
 function mouseoverListener(event) {
@@ -131,8 +118,6 @@ function mouseoverListener(event) {
   }
 
   linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
-
-  urlToPreload = linkElement.href
 
   mouseoverTimer = setTimeout(() => {
     preload(linkElement.href)
@@ -149,8 +134,6 @@ function mousedownListener(event) {
 
   linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
-  urlToPreload = linkElement.href
-
   preload(linkElement.href)
 }
 
@@ -163,18 +146,10 @@ function mouseoutListener(event) {
     clearTimeout(mouseoverTimer)
     mouseoverTimer = undefined
   }
-
-  urlToPreload = undefined
-
-  stopPreloading()
 }
 
 function isPreloadable(linkElement) {
   if (!linkElement || !linkElement.href) {
-    return
-  }
-
-  if (urlToPreload == linkElement.href) {
     return
   }
 
@@ -209,18 +184,9 @@ function isPreloadable(linkElement) {
   return true
 }
 
-function preload(url, isFromViewport) {
-  if (!isFromViewport) {
-    prefetcher.href = url
-  }
-  else {
-    const additionalPrefetcher = document.createElement('link')
-    additionalPrefetcher.rel = 'prefetch'
-    additionalPrefetcher.href = url
-    document.head.appendChild(additionalPrefetcher)
-  }
-}
-
-function stopPreloading() {
-  prefetcher.removeAttribute('href')
+function preload(url) {
+  const prefetcher = document.createElement('link')
+  prefetcher.rel = 'prefetch'
+  prefetcher.href = url
+  document.head.appendChild(prefetcher)
 }
