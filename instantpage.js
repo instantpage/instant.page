@@ -6,7 +6,6 @@ const prefetches = new Set()
 const prefetchElement = document.createElement('link')
 const isSupported = prefetchElement.relList && prefetchElement.relList.supports && prefetchElement.relList.supports('prefetch')
                     && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
-const isDataSaverEnabled = navigator.connection && navigator.connection.saveData
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
@@ -29,7 +28,9 @@ if ('instantIntensity' in document.body.dataset) {
      * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
      * Note that the viewport (which we check here) is smaller than the resolution due to the UI’s chrome */
     if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
-      useViewport = true
+      if (!(navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g')))) {
+        useViewport = true
+      }
     }
   }
   else {
@@ -40,7 +41,7 @@ if ('instantIntensity' in document.body.dataset) {
   }
 }
 
-if (isSupported && !isDataSaverEnabled) {
+if (isSupported) {
   const eventListenersOptions = {
     capture: true,
     passive: true,
