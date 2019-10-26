@@ -23,12 +23,17 @@ if ('instantIntensity' in document.body.dataset) {
       useMousedownOnly = true
     }
   }
-  else if (intensity == 'viewport') {
-    /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
-     * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
-     * Note that the viewport (which we check here) is smaller than the resolution due to the UI’s chrome */
-    if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
-      if (!(navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g')))) {
+  else if (intensity.substr(0, 'viewport'.length) == 'viewport') {
+    if (!(navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g')))) {
+      if (intensity == "viewport") {
+        /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
+         * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
+         * Note that the viewport (which we check here) is smaller than the resolution due to the UI’s chrome */
+        if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
+          useViewport = true
+        }
+      }
+      else if (intensity == "viewport-all") {
         useViewport = true
       }
     }
