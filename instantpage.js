@@ -24,7 +24,7 @@ if ('instantIntensity' in document.body.dataset) {
     }
   }
   else if (intensity.substr(0, 'viewport'.length) == 'viewport') {
-    if (!(navigator.connection && (navigator.connection.saveData || navigator.connection.effectiveType.includes('2g')))) {
+    if (!(navigator.connection && (navigator.connection.saveData || (navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g'))))) {
       if (intensity == "viewport") {
         /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
          * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
