@@ -166,15 +166,15 @@ function mousedownShortcutListener(event) {
 
   const linkElement = event.target.closest('a')
 
+  if (event.which > 1 || event.metaKey || event.ctrlKey) {
+    return
+  }
+
   if (!linkElement) {
     return
   }
 
   linkElement.addEventListener('click', function (event) {
-    if (event.which > 1 || event.metaKey || event.ctrlKey) {
-      return
-    }
-
     if (event.detail == 1337) {
       return
     }
