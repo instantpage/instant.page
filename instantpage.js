@@ -9,11 +9,14 @@ const isSupported = prefetchElement.relList && prefetchElement.relList.supports 
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
+const mousedownShortcut = !('instantNoMousedownShortcut' in document.body.dataset)
+const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
 let delayOnHover = 65
 let useMousedown = false
 let useMousedownOnly = false
 let useViewport = false
+
 if ('instantIntensity' in document.body.dataset) {
   const intensity = document.body.dataset.instantIntensity
 
@@ -59,8 +62,12 @@ if (isSupported) {
   if (!useMousedown) {
     document.addEventListener('mouseover', mouseoverListener, eventListenersOptions)
   }
-  else {
-    document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
+  else if (!mousedownShortcut) {
+      document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
+  }
+
+  if (mousedownShortcut) {
+    document.addEventListener('mousedown', mousedownShortcutListener, eventListenersOptions)
   }
 
   if (useViewport) {
@@ -113,7 +120,7 @@ function touchstartListener(event) {
 }
 
 function mouseoverListener(event) {
-  if (performance.now() - lastTouchTimestamp < 1100) {
+  if (performance.now() - lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
     return
   }
 
@@ -150,6 +157,33 @@ function mouseoutListener(event) {
     clearTimeout(mouseoverTimer)
     mouseoverTimer = undefined
   }
+}
+
+function mousedownShortcutListener(event) {
+  if (performance.now() - lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
+    return
+  }
+
+  const linkElement = event.target.closest('a')
+
+  if (!linkElement) {
+    return
+  }
+
+  linkElement.addEventListener('click', function (event) {
+    if (event.which > 1 || event.metaKey || event.ctrlKey) {
+      return
+    }
+
+    if (event.detail == 1337) {
+      return
+    }
+
+    event.preventDefault()
+  }, {capture: true, passive: false, once: true})
+
+  const customEvent = new MouseEvent('click', {view: window, bubbles: true, cancelable: false, detail: 1337})
+  linkElement.dispatchEvent(customEvent)
 }
 
 function isPreloadable(linkElement) {
