@@ -9,7 +9,7 @@ const isSupported = prefetchElement.relList && prefetchElement.relList.supports 
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
-const mousedownShortcut = !('instantNoMousedownShortcut' in document.body.dataset)
+const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
 const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
 let delayOnHover = 65
