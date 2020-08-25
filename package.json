@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "minify": "uglifyjs ./instantpage.js --compress --mangle --toplevel --comments \"/^!/\" --output ./instantpage.min.js",
+    "minify": "npx uglifyjs ./instantpage.js --compress --mangle --toplevel --comments \"/^!/\" --output ./instantpage.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/instantpage/instant.page/issues"
   },
-  "homepage": "https://instant.page/"
+  "homepage": "https://instant.page/",
+  "devDependencies": {
+    "uglify-es": "^3.3.9"
+  }
 }

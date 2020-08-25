@@ -18,4 +18,4 @@ And access http://127.0.0.1:8000/. Or specify another port with an argument afte
 
 ## Minifying
 
-To minify instantpage.js into instantpage.min.js install uglify-es globally (`npm i uglify-es -g`) then run `npm run minify`.
+To minify instantpage.js into instantpage.min.js run `npm run minify`.
