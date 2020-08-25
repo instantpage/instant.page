@@ -124,6 +124,10 @@ function mouseoverListener(event) {
     return
   }
 
+  if (!'closest' in event.target) {
+    return
+  }
+
   const linkElement = event.target.closest('a')
 
   if (!isPreloadable(linkElement)) {
