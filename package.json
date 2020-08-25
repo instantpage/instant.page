@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/instantpage/instant.page/issues"
   },
-  "homepage": "https://instant.page/"
+  "homepage": "https://instant.page/",
+  "devDependencies": {
+    "uglify-es": "^3.3.9"
+  }
 }
