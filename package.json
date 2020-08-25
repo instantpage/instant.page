@@ -8,6 +8,7 @@
   },
   "scripts": {
     "minify": "uglifyjs ./instantpage.js --compress --mangle --toplevel --comments \"/^!/\" --output ./instantpage.min.js",
+    "minify-iife": "npm run minify && echo \"(function() {\n$(cat instantpage.min.js)\" > instantpage.min.js && echo \"})()\" >> instantpage.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
