@@ -19,3 +19,9 @@ And access http://127.0.0.1:8000/. Or specify another port with an argument afte
 ## Minifying
 
 To minify instantpage.js into instantpage.min.js install uglify-es globally (`npm i uglify-es -g`) then run `npm run minify`.
+
+## Third-party integrations
+
+This is a list of integrations for third-party systems:
+* [Wordpress Integration](https://wordpress.org/plugins/instant-page/)
+* [Magento 2 Page Preload](https://www.jajuma.de/en/jajuma-develop/extensions/page-preload-extension-for-magento-2)
