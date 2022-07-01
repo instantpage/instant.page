@@ -124,6 +124,15 @@ function mouseoverListener(event) {
     return
   }
 
+  if (!('closest' in event.target)) {
+    // Without this check sometimes an error “event.target.closest is not a function” is thrown, for unknown reasons
+    // That error denotes that `event.target` isn’t undefined. My best guess is that it’s the Document.
+
+    // Details could be gleaned from throwing such an error:
+    //throw new TypeError(`instant.page non-element event target: timeStamp=${~~event.timeStamp}, type=${event.type}, typeof=${typeof event.target}, nodeType=${event.target.nodeType}, nodeName=${event.target.nodeName}, viewport=${innerWidth}x${innerHeight}, coords=${event.clientX}x${event.clientY}, scroll=${scrollX}x${scrollY}`)
+
+    return
+  }
   const linkElement = event.target.closest('a')
 
   if (!isPreloadable(linkElement)) {
