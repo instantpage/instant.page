@@ -232,6 +232,10 @@ function isPreloadable(linkElement) {
 }
 
 function preload(url) {
+  if (typeof instantUrlModifier === 'function') {
+    url = instantUrlModifier(url);
+  }
+
   if (prefetches.has(url)) {
     return
   }
@@ -239,6 +243,9 @@ function preload(url) {
   const prefetcher = document.createElement('link')
   prefetcher.rel = 'prefetch'
   prefetcher.href = url
+  if (typeof instantLinkModifier === 'function') {
+    instantLinkModifier(prefetcher);
+  }
   document.head.appendChild(prefetcher)
 
   prefetches.add(url)
