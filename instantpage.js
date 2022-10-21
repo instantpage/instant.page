@@ -6,6 +6,7 @@ const prefetches = new Set()
 const prefetchElement = document.createElement('link')
 const isSupported = prefetchElement.relList && prefetchElement.relList.supports && prefetchElement.relList.supports('prefetch')
                     && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
+const isOnline = () => window.navigator.onLine
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
@@ -232,6 +233,10 @@ function isPreloadable(linkElement) {
 }
 
 function preload(url) {
+  if (!isOnline()) {
+        return
+  }
+  
   if (prefetches.has(url)) {
     return
   }
