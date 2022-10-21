@@ -191,7 +191,7 @@ function mousedownShortcutListener(event) {
     event.preventDefault()
   }, {capture: true, passive: false, once: true})
 
-  const customEvent = new MouseEvent('click', {view: window, bubbles: true, cancelable: false, detail: 1337})
+  const customEvent = new MouseEvent('click', {view: window, bubbles: true, cancelable: true, detail: 1337})
   linkElement.dispatchEvent(customEvent)
 }
 
