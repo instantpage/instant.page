@@ -1,4 +1,4 @@
-/*! instant.page v5.1.1 - (C) 2019-2022 Alexandre Dieulot - https://instant.page/license */
+/*! instant.page v5.1.1 - (C) 2019-2023 Alexandre Dieulot - https://instant.page/license */
 
 let mouseoverTimer
 let lastTouchTimestamp
