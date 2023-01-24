@@ -116,7 +116,7 @@ function touchstartListener(event) {
     return
   }
 
-  preload(linkElement.href)
+  preload(linkElement.href, 'high')
 }
 
 function mouseoverListener(event) {
@@ -142,7 +142,7 @@ function mouseoverListener(event) {
   linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
   mouseoverTimer = setTimeout(() => {
-    preload(linkElement.href)
+    preload(linkElement.href, 'high')
     mouseoverTimer = undefined
   }, delayOnHover)
 }
@@ -154,7 +154,7 @@ function mousedownListener(event) {
     return
   }
 
-  preload(linkElement.href)
+  preload(linkElement.href, 'high')
 }
 
 function mouseoutListener(event) {
@@ -231,7 +231,7 @@ function isPreloadable(linkElement) {
   return true
 }
 
-function preload(url) {
+function preload(url, fetchPriority = 'auto') {
   if (prefetches.has(url)) {
     return
   }
@@ -239,6 +239,7 @@ function preload(url) {
   const prefetcher = document.createElement('link')
   prefetcher.rel = 'prefetch'
   prefetcher.href = url
+  prefetcher.fetchPriority = fetchPriority
   document.head.appendChild(prefetcher)
 
   prefetches.add(url)
