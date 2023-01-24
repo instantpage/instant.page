@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>prefetch fetchpriority test</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  font-family: system-ui;
+  background-color: aliceblue;
+}
+
+code {
+  font-family: ui-monospace, monospace;
+}
+
+fieldset {
+  border: 1px solid hsla(0 0% 0% / .5);
+  margin-block: 1em;
+}
+
+input[inputmode=numeric] {
+  width: 2em;
+}
+
+input[type=radio] {
+  accent-color: crimson;
+}
+
+img {
+  border: 1px solid;
+}
+</style>
+
+<details>
+  <summary>Instructions</summary>
+  <p>
+    This test is meant to observe the impact of <code>&lt;link rel=prefetch fetchpriority=high&gt;</code>.<br>
+  </p>
+
+  <p>
+    It needs to be run on a remote HTTP/2 server with a device on 3G/4G/ADSL.
+  </p>
+
+  <p>
+    An image file named “image.bmp” must be present in the same directory. A 2 MB file can be generated with ImageMagick like so: <code>convert -size 820x820 canvas:crimson image.bmp</code>
+  </p>
+</details>
+
+<form id="image-generation">
+  <fieldset>
+    <legend>Image generation</legend>
+    Generate <input name="count" inputmode="numeric" pattern="[0-9]*" value="10"> images <input type="submit">
+  </fieldset>
+</form>
+
+<script type="module">
+document.querySelector('form#image-generation').addEventListener('submit', function (event) {
+  event.preventDefault()
+  const formData = new FormData(event.target)
+  const count = parseInt(formData.get('count'))
+  let html = ''
+  for (let i = 0; i < count; i++) {
+    html += `<img alt src="image.bmp?${crypto.randomUUID()}" width="40" height="40">\n`
+  }
+  const paragraphElement = document.createElement('p')
+  paragraphElement.innerHTML = html
+  document.querySelector('form').before(paragraphElement)
+})
+</script>
+
+<form id="prefetching">
+  <fieldset>
+    <legend>Prefetching</legend>
+    <div>
+      fetchPriority:
+      <label>
+        <input type="radio" name="fetchpriority">
+        default
+      </label>
+      <label>
+        <input type="radio" name="fetchpriority" value="high">
+        high
+      </label>
+      <label>
+        <input type="radio" name="fetchpriority" value="both" checked>
+        both (two requests)
+      </label>
+    </div>
+    <div>
+      <button>Prefetch</button>
+    </div>
+  </fieldset>
+</form>
+
+<script type="module">
+document.querySelector('form#prefetching').addEventListener('submit', function (event) {
+  event.preventDefault()
+  const formData = new FormData(event.target)
+  const fetchPriority = formData.get('fetchpriority')
+  if (fetchPriority == 'high') {
+    preload(`fetchpriority.html?${crypto.randomUUID()}`, 'high')
+  }
+  else if (fetchPriority == 'both') {
+    const highThenLow = Math.random() < .5
+    if (highThenLow) {
+      preload(`fetchpriority.html?${crypto.randomUUID()}`, 'high')
+      preload(`fetchpriority.html?${crypto.randomUUID()}`)
+    }
+    else {
+      preload(`fetchpriority.html?${crypto.randomUUID()}`)
+      preload(`fetchpriority.html?${crypto.randomUUID()}`, 'high')
+    }
+  }
+  else {
+    preload(`fetchpriority.html?${crypto.randomUUID()}`)
+  }
+
+})
+
+function preload(url, fetchPriority) {
+  const linkElement = document.createElement('link')
+  linkElement.rel = 'prefetch'
+  linkElement.href = url
+  if (fetchPriority) {
+    linkElement.fetchPriority = fetchPriority
+  }
+  document.head.append(linkElement)
+}
+</script>
