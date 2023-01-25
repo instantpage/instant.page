@@ -102,15 +102,15 @@ async function requestListener(req, res) {
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
-        content += `<a href="/${i}?${Math.random()}" ${dataInstantAttribute}><span>Page ${i}</span></a>`
+        content += `<a href="/${i}?${crypto.randomUUID()}" ${dataInstantAttribute}><span>Page ${i}</span></a>`
       }
     }
 
-    content += `<a href="/${page}?${Math.random()}" target="_blank" ${dataInstantAttribute}><span>Opens in a new tab</span></a>`
-    content += `<a href="/${page}?${Math.random()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
+    content += `<a href="/${page}?${crypto.randomUUID()}" target="_blank" ${dataInstantAttribute}><span>Opens in a new tab</span></a>`
+    content += `<a href="/${page}?${crypto.randomUUID()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
     content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
-    content += `<a href="/${page}?${Math.random()}" data-no-instant><span>Manually blacklisted link</span></a>`
-    content += `<a href="/${page}?${Math.random()}"><span>Non-whitelisted link</span></a>`
+    content += `<a href="/${page}?${crypto.randomUUID()}" data-no-instant><span>Manually blacklisted link</span></a>`
+    content += `<a href="/${page}?${crypto.randomUUID()}"><span>Non-whitelisted link</span></a>`
     content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
     content += `<a href="file:///C:/"><span>file: link</span></a>`
