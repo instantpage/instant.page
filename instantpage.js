@@ -27,6 +27,18 @@ let useMousedown = false
 let useMousedownOnly = false
 let useViewport = false
 
+let chromiumMajorVersionClientHint = null
+// `navigator.userAgentData` is available in Chromium 90+,
+// though it was not enabled for everyone at first.
+// So it’s only reliable for Chromium ~100+, and only on HTTPS or localhost.
+if (navigator.userAgentData) {
+  navigator.userAgentData.brands.forEach(({brand, version}) => {
+    if (brand == 'Chromium') {
+      chromiumMajorVersionClientHint = parseInt(version)
+    }
+  })
+}
+
 if ('instantIntensity' in document.body.dataset) {
   const intensity = document.body.dataset.instantIntensity
 
