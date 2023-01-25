@@ -81,21 +81,20 @@ if (isSupported) {
   }
 
   if (useViewport) {
-    let triggeringFunction
-    if (window.requestIdleCallback) {
-      triggeringFunction = (callback) => {
-        requestIdleCallback(callback, {
-          timeout: 1500,
-        })
-      }
-    }
-    else {
-      triggeringFunction = (callback) => {
+    let requestIdleCallbackOrFallback = window.requestIdleCallback
+    // Safari has no support as of 16.3: https://webkit.org/b/164193
+    if (!requestIdleCallbackOrFallback) {
+      requestIdleCallbackOrFallback = (callback) => {
         callback()
+        // A smarter fallback like setTimeout is not used because devices that
+        // may eventually be eligible to a Safari version supporting prefetch
+        // will be very powerful.
+        // The weakest devices that could be eligible are the 2017 iPad and
+        // the 2016 MacBook.
       }
     }
 
-    triggeringFunction(() => {
+    requestIdleCallbackOrFallback(function observeIntersection() {
       const intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
@@ -111,6 +110,8 @@ if (isSupported) {
           intersectionObserver.observe(linkElement)
         }
       })
+    }, {
+      timeout: 1500,
     })
   }
 }
