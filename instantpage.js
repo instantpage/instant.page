@@ -110,16 +110,16 @@ if (isSupported) {
       const intersectionObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            const linkElement = entry.target
-            intersectionObserver.unobserve(linkElement)
-            preload(linkElement.href)
+            const anchorElement = entry.target
+            intersectionObserver.unobserve(anchorElement)
+            preload(anchorElement.href)
           }
         })
       })
 
-      document.querySelectorAll('a').forEach((linkElement) => {
-        if (isPreloadable(linkElement)) {
-          intersectionObserver.observe(linkElement)
+      document.querySelectorAll('a').forEach((anchorElement) => {
+        if (isPreloadable(anchorElement)) {
+          intersectionObserver.observe(anchorElement)
         }
       })
     }, {
@@ -133,13 +133,13 @@ function touchstartListener(event) {
    * must be assigned on touchstart to be measured on mouseover. */
   lastTouchTimestamp = performance.now()
 
-  const linkElement = event.target.closest('a')
+  const anchorElement = event.target.closest('a')
 
-  if (!isPreloadable(linkElement)) {
+  if (!isPreloadable(anchorElement)) {
     return
   }
 
-  preload(linkElement.href, 'high')
+  preload(anchorElement.href, 'high')
 }
 
 function mouseoverListener(event) {
@@ -156,28 +156,28 @@ function mouseoverListener(event) {
 
     return
   }
-  const linkElement = event.target.closest('a')
+  const anchorElement = event.target.closest('a')
 
-  if (!isPreloadable(linkElement)) {
+  if (!isPreloadable(anchorElement)) {
     return
   }
 
-  linkElement.addEventListener('mouseout', mouseoutListener, {passive: true})
+  anchorElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
   mouseoverTimer = setTimeout(() => {
-    preload(linkElement.href, 'high')
+    preload(anchorElement.href, 'high')
     mouseoverTimer = undefined
   }, delayOnHover)
 }
 
 function mousedownListener(event) {
-  const linkElement = event.target.closest('a')
+  const anchorElement = event.target.closest('a')
 
-  if (!isPreloadable(linkElement)) {
+  if (!isPreloadable(anchorElement)) {
     return
   }
 
-  preload(linkElement.href, 'high')
+  preload(anchorElement.href, 'high')
 }
 
 function mouseoutListener(event) {
@@ -196,17 +196,17 @@ function mousedownShortcutListener(event) {
     return
   }
 
-  const linkElement = event.target.closest('a')
+  const anchorElement = event.target.closest('a')
 
   if (event.which > 1 || event.metaKey || event.ctrlKey) {
     return
   }
 
-  if (!linkElement) {
+  if (!anchorElement) {
     return
   }
 
-  linkElement.addEventListener('click', function (event) {
+  anchorElement.addEventListener('click', function (event) {
     if (event.detail == 1337) {
       return
     }
@@ -215,43 +215,43 @@ function mousedownShortcutListener(event) {
   }, {capture: true, passive: false, once: true})
 
   const customEvent = new MouseEvent('click', {view: window, bubbles: true, cancelable: false, detail: 1337})
-  linkElement.dispatchEvent(customEvent)
+  anchorElement.dispatchEvent(customEvent)
 }
 
-function isPreloadable(linkElement) {
-  if (!linkElement || !linkElement.href) {
+function isPreloadable(anchorElement) {
+  if (!anchorElement || !anchorElement.href) {
     return
   }
 
-  if (useWhitelist && !('instant' in linkElement.dataset)) {
+  if (useWhitelist && !('instant' in anchorElement.dataset)) {
     return
   }
 
-  if (linkElement.origin != location.origin) {
-    let allowed = allowExternalLinks || 'instant' in linkElement.dataset
+  if (anchorElement.origin != location.origin) {
+    let allowed = allowExternalLinks || 'instant' in anchorElement.dataset
     if (!allowed || !chromiumMajorVersionClientHint) {
       // Chromium-only: see comment on “restrictive prefetch”
       return
     }
   }
 
-  if (!['http:', 'https:'].includes(linkElement.protocol)) {
+  if (!['http:', 'https:'].includes(anchorElement.protocol)) {
     return
   }
 
-  if (linkElement.protocol == 'http:' && location.protocol == 'https:') {
+  if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
     return
   }
 
-  if (!allowQueryString && linkElement.search && !('instant' in linkElement.dataset)) {
+  if (!allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
     return
   }
 
-  if (linkElement.hash && linkElement.pathname + linkElement.search == location.pathname + location.search) {
+  if (anchorElement.hash && anchorElement.pathname + anchorElement.search == location.pathname + location.search) {
     return
   }
 
-  if ('noInstant' in linkElement.dataset) {
+  if ('noInstant' in anchorElement.dataset) {
     return
   }
 
