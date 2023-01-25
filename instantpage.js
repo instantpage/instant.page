@@ -227,8 +227,11 @@ function isPreloadable(linkElement) {
     return
   }
 
-  if (!allowExternalLinks && linkElement.origin != location.origin && !('instant' in linkElement.dataset)) {
-    return
+  if (linkElement.origin != location.origin) {
+    let allowed = allowExternalLinks || 'instant' in linkElement.dataset
+    if (!allowed) {
+      return
+    }
   }
 
   if (!['http:', 'https:'].includes(linkElement.protocol)) {
