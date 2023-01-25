@@ -3,9 +3,19 @@
 let mouseoverTimer
 let lastTouchTimestamp
 const prefetches = new Set()
-const prefetchElement = document.createElement('link')
-const isSupported = prefetchElement.relList && prefetchElement.relList.supports && prefetchElement.relList.supports('prefetch')
-                    && window.IntersectionObserver && 'isIntersecting' in IntersectionObserverEntry.prototype
+
+// instant.page is meant to be loaded with <script type=module>
+// (though sometimes webmasters load it as a regular script).
+// So it’s normally executed (and must not cause JavaScript errors) in:
+// - Chromium 61+
+// - Gecko in Firefox 60+
+// - WebKit in Safari 10.1+ (iOS 10.3+, macOS 10.10+)
+//
+// The check below used to check for IntersectionObserverEntry.isIntersecting
+// but module scripts support implies this compatibility — except in Safari
+// 10.1–12.0, but the prefetch check takes care of it.
+const isSupported = document.createElement('link').relList.supports('prefetch')
+
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
