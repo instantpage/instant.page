@@ -229,7 +229,8 @@ function isPreloadable(linkElement) {
 
   if (linkElement.origin != location.origin) {
     let allowed = allowExternalLinks || 'instant' in linkElement.dataset
-    if (!allowed) {
+    if (!allowed || !chromiumMajorVersionClientHint) {
+      // Chromium-only: see comment on “restrictive prefetch”
       return
     }
   }
