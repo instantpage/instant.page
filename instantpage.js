@@ -263,6 +263,12 @@ function preload(url, fetchPriority = 'auto') {
   prefetcher.rel = 'prefetch'
   prefetcher.href = url
   prefetcher.fetchPriority = fetchPriority
+
+  prefetcher.as = 'document'
+  // as=document is Chromium-only and allows cross-origin prefetches to be
+  // usable for navigation. They call it “restrictive prefetch” and intend
+  // to remove it: https://crbug.com/1352371
+
   document.head.appendChild(prefetcher)
 
   prefetches.add(url)
