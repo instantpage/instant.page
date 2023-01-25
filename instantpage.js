@@ -42,13 +42,13 @@ if (navigator.userAgentData) {
 if ('instantIntensity' in document.body.dataset) {
   const intensity = document.body.dataset.instantIntensity
 
-  if (intensity.substr(0, 'mousedown'.length) == 'mousedown') {
+  if (intensity.startsWith('mousedown')) {
     useMousedown = true
     if (intensity == 'mousedown-only') {
       useMousedownOnly = true
     }
   }
-  else if (intensity.substr(0, 'viewport'.length) == 'viewport') {
+  else if (intensity.startsWith('viewport')) {
     if (!(navigator.connection && (navigator.connection.saveData || (navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g'))))) {
       if (intensity == "viewport") {
         /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
