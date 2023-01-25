@@ -1,9 +1,9 @@
-const http = require('http')
-const fsPromises = require('fs').promises
-const path = require('path')
-const crypto = require('crypto')
+import http from 'node:http'
+import fs from 'node:fs/promises'
+import crypto from 'node:crypto'
+import util from 'node:util'
 
-const sleep = require('util').promisify(setTimeout)
+const sleep = util.promisify(setTimeout)
 
 let PORT = parseInt(process.argv[2])
 if (isNaN(PORT)) {
@@ -65,7 +65,8 @@ async function requestListener(req, res) {
 
   let content = ''
 
-  const jsContent = await fsPromises.readFile(path.resolve(__dirname, `../${USE_MINIFIED ? 'instantpage.min.js' : 'instantpage.js'}`))
+  const jsPath = new URL(`../${USE_MINIFIED ? 'instantpage.min.js' : 'instantpage.js'}`, import.meta.url)
+  const jsContent = await fs.readFile(jsPath)
   const jsHash = sha384(jsContent)
 
   if (pathString == 'instantpage.js') {
@@ -79,7 +80,8 @@ async function requestListener(req, res) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
 
-    content += await fsPromises.readFile(path.resolve(__dirname, 'header.html'))
+    const headerPath = new URL('header.html', import.meta.url)
+    content += await fs.readFile(headerPath)
 
     if (ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS) {
       content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
@@ -90,7 +92,7 @@ async function requestListener(req, res) {
     else if (INTENSITY != 65) {
       content = content.replace('<body', `<body data-instant-intensity="${INTENSITY}"`)
     }
-    dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
+    const dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
 
     content = content.replace(':checked_aqsael', ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS ? 'checked' : '')
     content = content.replace(':checked_whitelist', USE_WHITELIST ? 'checked' : '')
@@ -115,7 +117,8 @@ async function requestListener(req, res) {
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
     content += `<a href="file:///C:/"><span>file: link</span></a>`
 
-    let footer = await fsPromises.readFile(path.resolve(__dirname, 'footer.html'))
+    const footerPath = new URL('footer.html', import.meta.url)
+    let footer = await fs.readFile(footerPath)
     footer = footer.toString().replace('__HASH__', jsHash)
     content += footer
   }
