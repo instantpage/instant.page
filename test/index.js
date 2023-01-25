@@ -5,8 +5,7 @@ const crypto = require('crypto')
 
 const sleep = require('util').promisify(setTimeout)
 
-const argvIndexOfFile = process.argv.indexOf(__filename)
-let PORT = parseInt(process.argv[argvIndexOfFile + 1])
+let PORT = parseInt(process.argv[2])
 if (isNaN(PORT)) {
   PORT = 8000
 }
