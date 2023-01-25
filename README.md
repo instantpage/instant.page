@@ -10,7 +10,7 @@
 
 With [Node](https://nodejs.org/), run:
 
-`node test/app.js`
+`node test`
 
 And access http://127.0.0.1:8000/. Or specify another port with an argument after the filename.
 
