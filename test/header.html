@@ -71,8 +71,15 @@ form input[type="text"] {
   </label>
   <label>
     Intensity:
-    <input name="intensity" type="text" :value_intensity>
+    <input name="intensity" type="text" list="intensity-datalist" :value_intensity>
   </label>
+  <datalist id="intensity-datalist">
+    <option>65</option>
+    <option>mousedown</option>
+    <option>mousedown-only</option>
+    <option>viewport</option>
+    <option>viewport-all</option>
+  </datalist>
   <label>
     Cache max age (in seconds):
     <input name="cacheAge" type="number" :value_cacheAge>
