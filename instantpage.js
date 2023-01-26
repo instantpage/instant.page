@@ -263,17 +263,17 @@ function preload(url, fetchPriority = 'auto') {
     return
   }
 
-  const prefetcher = document.createElement('link')
-  prefetcher.rel = 'prefetch'
-  prefetcher.href = url
-  prefetcher.fetchPriority = fetchPriority
+  const linkElement = document.createElement('link')
+  linkElement.rel = 'prefetch'
+  linkElement.href = url
+  linkElement.fetchPriority = fetchPriority
 
-  prefetcher.as = 'document'
+  linkElement.as = 'document'
   // as=document is Chromium-only and allows cross-origin prefetches to be
   // usable for navigation. They call it “restrictive prefetch” and intend
   // to remove it: https://crbug.com/1352371
 
-  document.head.appendChild(prefetcher)
+  document.head.appendChild(linkElement)
 
   prefetches.add(url)
 }
