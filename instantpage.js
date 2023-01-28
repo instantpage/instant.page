@@ -51,10 +51,21 @@ if ('instantIntensity' in document.body.dataset) {
   else if (intensity.startsWith('viewport')) {
     if (!(navigator.connection && (navigator.connection.saveData || (navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g'))))) {
       if (intensity == "viewport") {
-        /* Biggest iPhone resolution (which we want): 414 × 896 = 370944
-         * Small 7" tablet resolution (which we don’t want): 600 × 1024 = 614400
-         * Note that the viewport (which we check here) is smaller than the resolution due to the UI’s chrome */
         if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
+          // Smartphones are the most likely to have a slow connection, and
+          // their small screen size limits the number of links (and thus
+          // server load).
+          //
+          // Foldable phones (being expensive as of 2023), tablets and PCs
+          // generally have a decent connection, and a big screen displaying
+          // more links that would put more load on the server.
+          //
+          // iPhone 14 Pro Max (want): 430×932 = 400 760
+          // Samsung Galaxy S22 Ultra with display size set to 80% (want):
+          // 450×965 = 434 250
+          // Small tablet (don’t want): 600×960 = 576 000
+          // Those number are virtual screen size, the viewport (used for
+          // the check above) will be smaller with the browser’s interface.
           useViewport = true
         }
       }
