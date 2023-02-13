@@ -88,6 +88,13 @@ form input[type="text"] {
     Use minified:
     <input name="minified" type="checkbox" :checked_minified>
   </label>
+  <label>Vary: Accept header:
+    <select name="varyAccept">
+      <option :vary_accept_off>Off</option>
+      <option :vary_accept_on>On</option>
+      <option :vary_accept_simulate_shopify>Simulate Shopify</option>
+    </select>
+  </label>
   <label>
     <input type="submit" value="OK">
   </label>

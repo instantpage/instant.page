@@ -16,6 +16,7 @@ let CACHE_MAX_AGE = 0
 let USE_WHITELIST = 0
 let INTENSITY = 65
 let USE_MINIFIED = 0
+let VARY_ACCEPT = 'Off'
 
 function handleCookies(req) {
   const cookies = req.headers.cookie
@@ -41,6 +42,9 @@ function handleCookies(req) {
       INTENSITY = value.split(',')[4]
     }
     USE_MINIFIED = cookieValueSplit[5]
+    if (value.split(',')[6]) {
+      VARY_ACCEPT = value.split(',')[6]
+    }
   })
 }
 
@@ -80,12 +84,17 @@ async function requestListener(req, res) {
       headers['Cache-Control'] = `max-age=${CACHE_MAX_AGE}`
     }
 
+    if (VARY_ACCEPT != 'Off') {
+      headers['Vary'] = 'Accept'
+    }
+
     const headerPath = new URL('header.html', import.meta.url)
     content += await fs.readFile(headerPath)
 
     if (ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS) {
       content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
     }
+
     if (USE_WHITELIST) {
       content = content.replace('<body', '<body data-instant-whitelist')
     }
@@ -94,12 +103,25 @@ async function requestListener(req, res) {
     }
     const dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
 
+    if (VARY_ACCEPT == 'On') {
+      content = content.replace('<body', '<body data-instant-vary-accept')
+    }
+    if (VARY_ACCEPT == 'Simulate Shopify') {
+      content = content.replace(/<body[^>]*>/, '$&\n<script>Shopify = {}</script>')
+    }
+
     content = content.replace(':checked_aqsael', ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS ? 'checked' : '')
     content = content.replace(':checked_whitelist', USE_WHITELIST ? 'checked' : '')
     content = content.replace(':value_sleep', `value="${SLEEP_TIME}"`)
     content = content.replace(':value_cacheAge', `value="${CACHE_MAX_AGE}"`)
     content = content.replace(':value_intensity', `value="${INTENSITY}"`)
     content = content.replace(':checked_minified', USE_MINIFIED ? 'checked' : '')
+    content = content.replaceAll(/ :vary_accept_([a-z_]+)/g, (match, p1) => {
+      if (p1 == VARY_ACCEPT.toLowerCase().replace(' ', '_')) {
+        return ' selected'
+      }
+      return ''
+    })
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
