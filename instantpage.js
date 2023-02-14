@@ -9,14 +9,6 @@ const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
 const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
 
-// The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
-// unusable, as Chromium used to send a different `Accept` header.
-// It’s applied on all Shopify sites by default, as Shopify is very popular
-// and is the main source of this problem.
-// `window.Shopify` only exists on “classic” Shopify sites. Those using
-// Hydrogen (Remix SPA) aren’t concerned.
-const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
-
 const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
 let delayOnHover = 65
@@ -97,6 +89,14 @@ function init() {
   if (!isSupported) {
     return
   }
+
+  // The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
+  // unusable, as Chromium used to send a different `Accept` header.
+  // It’s applied on all Shopify sites by default, as Shopify is very popular
+  // and is the main source of this problem.
+  // `window.Shopify` only exists on “classic” Shopify sites. Those using
+  // Hydrogen (Remix SPA) aren’t concerned.
+  const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
 
   if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
     return
