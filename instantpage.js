@@ -161,8 +161,9 @@ function init() {
 
 function touchstartListener(event) {
   lastTouchTimestamp = performance.now()
-  /* Chrome on Android calls mouseover before touchcancel so `lastTouchTimestamp`
-   * must be assigned on touchstart to be measured on mouseover. */
+  // Chrome on Android triggers mouseover before touchcancel, so
+  // `lastTouchTimestamp` must be assigned on touchstart to be measured
+  // on mouseover.
 
   const anchorElement = event.target.closest('a')
 
