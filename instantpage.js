@@ -296,7 +296,17 @@ function preload(url, fetchPriority = 'auto') {
   const linkElement = document.createElement('link')
   linkElement.rel = 'prefetch'
   linkElement.href = url
+
   linkElement.fetchPriority = fetchPriority
+  // By default, a prefetch is loaded with a low priority.
+  // When there’s a fair chance that this prefetch is going to be used in the
+  // near term (= after a touch/mouse event), giving it a high priority helps
+  // make the page load faster in case there are other resources loading.
+  // Prioritizing it implicitly means deprioritizing every other resource
+  // that’s loading on the page. Due to HTML documents usually being much
+  // smaller than other resources (notably images and JavaScript), and
+  // prefetches happening once the initial page is sufficiently loaded,
+  // this theft of bandwidth should rarely be detrimental.
 
   linkElement.as = 'document'
   // as=document is Chromium-only and allows cross-origin prefetches to be
