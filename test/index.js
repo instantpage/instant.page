@@ -18,6 +18,13 @@ let INTENSITY = 65
 let USE_MINIFIED = 0
 let VARY_ACCEPT = 'Off'
 
+init()
+
+function init() {
+  http.createServer(requestListener).listen(PORT)
+  console.log(`-> Running on http://127.0.0.1:${PORT}/`)
+}
+
 function handleCookies(req) {
   const cookies = req.headers.cookie
 
@@ -155,6 +162,3 @@ async function requestListener(req, res) {
 function getRandomId() {
   return crypto.randomUUID().split('-')[0]
 }
-
-http.createServer(requestListener).listen(PORT)
-console.log(`-> Running on http://127.0.0.1:${PORT}/`)
