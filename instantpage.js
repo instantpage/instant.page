@@ -312,6 +312,13 @@ function preload(url, fetchPriority = 'auto') {
   // as=document is Chromium-only and allows cross-origin prefetches to be
   // usable for navigation. They call it “restrictive prefetch” and intend
   // to remove it: https://crbug.com/1352371
+  //
+  // This document from the Chrome team dated 2022-08-10
+  // https://docs.google.com/document/d/1x232KJUIwIf-k08vpNfV85sVCRHkAxldfuIA5KOqi6M
+  // claims (I haven’t tested) that data- and battery-saver modes as well as
+  // the setting to disable preloading do not disable restrictive prefetch,
+  // unlike regular prefetch. That’s good for prefetching on a touch/mouse
+  // event, but might be bad when prefetching every link in the viewport.
 
   document.head.appendChild(linkElement)
 
