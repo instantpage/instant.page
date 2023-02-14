@@ -1,8 +1,8 @@
 /*! instant.page v5.1.1 - (C) 2019-2023 Alexandre Dieulot - https://instant.page/license */
 
-let mouseoverTimer
-let lastTouchTimestamp
-const prefetches = new Set()
+let _mouseoverTimer
+let _lastTouchTimestamp
+const _prefetches = new Set()
 
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
@@ -160,9 +160,9 @@ function init() {
 }
 
 function touchstartListener(event) {
-  lastTouchTimestamp = performance.now()
+  _lastTouchTimestamp = performance.now()
   // Chrome on Android triggers mouseover before touchcancel, so
-  // `lastTouchTimestamp` must be assigned on touchstart to be measured
+  // `_lastTouchTimestamp` must be assigned on touchstart to be measured
   // on mouseover.
 
   const anchorElement = event.target.closest('a')
@@ -175,7 +175,7 @@ function touchstartListener(event) {
 }
 
 function mouseoverListener(event) {
-  if (performance.now() - lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
+  if (performance.now() - _lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
     return
   }
 
@@ -195,9 +195,9 @@ function mouseoverListener(event) {
 
   anchorElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
-  mouseoverTimer = setTimeout(() => {
+  _mouseoverTimer = setTimeout(() => {
     preload(anchorElement.href, 'high')
-    mouseoverTimer = undefined
+    _mouseoverTimer = undefined
   }, delayOnHover)
 }
 
@@ -216,14 +216,14 @@ function mouseoutListener(event) {
     return
   }
 
-  if (mouseoverTimer) {
-    clearTimeout(mouseoverTimer)
-    mouseoverTimer = undefined
+  if (_mouseoverTimer) {
+    clearTimeout(_mouseoverTimer)
+    _mouseoverTimer = undefined
   }
 }
 
 function mousedownShortcutListener(event) {
-  if (performance.now() - lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
+  if (performance.now() - _lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
     return
   }
 
@@ -290,7 +290,7 @@ function isPreloadable(anchorElement) {
 }
 
 function preload(url, fetchPriority = 'auto') {
-  if (prefetches.has(url)) {
+  if (_prefetches.has(url)) {
     return
   }
 
@@ -323,5 +323,5 @@ function preload(url, fetchPriority = 'auto') {
 
   document.head.appendChild(linkElement)
 
-  prefetches.add(url)
+  _prefetches.add(url)
 }
