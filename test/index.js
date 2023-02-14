@@ -62,7 +62,11 @@ function sha384(data) {
 }
 
 async function requestListener(req, res) {
-  console.log(`${req.url} -- ${req.headers['user-agent']}`)
+  const isPrefetched = req.headers['x-moz'] == 'prefetch' /* Firefox 109 */ || req.headers['purpose'] == 'prefetch' /* Chrome 110 & Safari 16.3 */
+  const prefetchIndicator = isPrefetched ? 'PF' : ' F'
+  const type = req.headers['sec-fetch-dest'] ? req.headers['sec-fetch-dest'].toUpperCase()[0] : '.'
+  const spaces = ' '.repeat(Math.max(0, 15 - req.url.length))
+  console.log(`${prefetchIndicator} ${type} ${req.url} ${spaces}${req.headers['user-agent']}`)
 
   handleCookies(req)
 
