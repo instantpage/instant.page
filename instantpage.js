@@ -91,7 +91,13 @@ if ('instantIntensity' in document.body.dataset) {
   }
 }
 
-if (isSupported) {
+init()
+
+function init() {
+  if (!isSupported) {
+    return
+  }
+
   const eventListenersOptions = {
     capture: true,
     passive: true,
