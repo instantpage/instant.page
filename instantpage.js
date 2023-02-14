@@ -98,6 +98,10 @@ function init() {
     return
   }
 
+  if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
+    return
+  }
+
   const eventListenersOptions = {
     capture: true,
     passive: true,
@@ -270,10 +274,6 @@ function isPreloadable(anchorElement) {
   }
 
   if (!allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
-    return
-  }
-
-  if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
     return
   }
 
