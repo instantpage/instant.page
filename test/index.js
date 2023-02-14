@@ -25,42 +25,6 @@ function init() {
   console.log(`-> Running on http://127.0.0.1:${PORT}/`)
 }
 
-function handleCookies(req) {
-  const cookies = req.headers.cookie
-
-  if (!cookies) {
-    return
-  }
-
-  cookies.split('; ').map((cookie) => {
-    const [key, value] = cookie.split('=')
-
-    if (key != 'instantpage_test') {
-      return
-    }
-
-    const cookieValueSplit = value.split(',').map((param) => parseInt(param))
-    ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS = cookieValueSplit[0]
-    SLEEP_TIME = cookieValueSplit[1]
-    CACHE_MAX_AGE = cookieValueSplit[2]
-    USE_WHITELIST = cookieValueSplit[3]
-    INTENSITY = cookieValueSplit[4]
-    if (isNaN(INTENSITY)) {
-      INTENSITY = value.split(',')[4]
-    }
-    USE_MINIFIED = cookieValueSplit[5]
-    if (value.split(',')[6]) {
-      VARY_ACCEPT = value.split(',')[6]
-    }
-  })
-}
-
-function sha384(data) {
-  const hash = crypto.createHash('sha384')
-  hash.update(data)
-  return hash.digest('base64')
-}
-
 async function requestListener(req, res) {
   const isPrefetched = req.headers['x-moz'] == 'prefetch' /* Firefox 109 */ || req.headers['purpose'] == 'prefetch' /* Chrome 110 & Safari 16.3 */
   const prefetchIndicator = isPrefetched ? 'PF' : ' F'
@@ -161,6 +125,42 @@ async function requestListener(req, res) {
   res.writeHead(200, headers)
   res.write(content)
   res.end()
+}
+
+function handleCookies(req) {
+  const cookies = req.headers.cookie
+
+  if (!cookies) {
+    return
+  }
+
+  cookies.split('; ').map((cookie) => {
+    const [key, value] = cookie.split('=')
+
+    if (key != 'instantpage_test') {
+      return
+    }
+
+    const cookieValueSplit = value.split(',').map((param) => parseInt(param))
+    ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS = cookieValueSplit[0]
+    SLEEP_TIME = cookieValueSplit[1]
+    CACHE_MAX_AGE = cookieValueSplit[2]
+    USE_WHITELIST = cookieValueSplit[3]
+    INTENSITY = cookieValueSplit[4]
+    if (isNaN(INTENSITY)) {
+      INTENSITY = value.split(',')[4]
+    }
+    USE_MINIFIED = cookieValueSplit[5]
+    if (value.split(',')[6]) {
+      VARY_ACCEPT = value.split(',')[6]
+    }
+  })
+}
+
+function sha384(data) {
+  const hash = crypto.createHash('sha384')
+  hash.update(data)
+  return hash.digest('base64')
 }
 
 function getRandomId() {
