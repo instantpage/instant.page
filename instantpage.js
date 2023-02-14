@@ -4,18 +4,6 @@ let mouseoverTimer
 let lastTouchTimestamp
 const prefetches = new Set()
 
-// instant.page is meant to be loaded with <script type=module>
-// (though sometimes webmasters load it as a regular script).
-// So it’s normally executed (and must not cause JavaScript errors) in:
-// - Chromium 61+
-// - Gecko in Firefox 60+
-// - WebKit in Safari 10.1+ (iOS 10.3+, macOS 10.10+)
-//
-// The check below used to check for IntersectionObserverEntry.isIntersecting
-// but module scripts support implies this compatibility — except in Safari
-// 10.1–12.0, but this prefetch check takes care of it.
-const isSupported = document.createElement('link').relList.supports('prefetch')
-
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
 const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
 const useWhitelist = 'instantWhitelist' in document.body.dataset
@@ -94,6 +82,18 @@ if ('instantIntensity' in document.body.dataset) {
 init()
 
 function init() {
+  // instant.page is meant to be loaded with <script type=module>
+  // (though sometimes webmasters load it as a regular script).
+  // So it’s normally executed (and must not cause JavaScript errors) in:
+  // - Chromium 61+
+  // - Gecko in Firefox 60+
+  // - WebKit in Safari 10.1+ (iOS 10.3+, macOS 10.10+)
+  //
+  // The check below used to check for IntersectionObserverEntry.isIntersecting
+  // but module scripts support implies this compatibility — except in Safari
+  // 10.1–12.0, but this prefetch check takes care of it.
+  const isSupported = document.createElement('link').relList.supports('prefetch')
+
   if (!isSupported) {
     return
   }
