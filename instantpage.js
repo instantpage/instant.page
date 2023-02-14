@@ -31,6 +31,7 @@ if ('instantIntensity' in document.body.dataset) {
     if (!(navigator.connection && (navigator.connection.saveData || (navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g'))))) {
       if (intensity == "viewport") {
         if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
+          useViewport = true
           // Smartphones are the most likely to have a slow connection, and
           // their small screen size limits the number of links (and thus
           // server load).
@@ -45,7 +46,6 @@ if ('instantIntensity' in document.body.dataset) {
           // Small tablet (don’t want): 600×960 = 576 000
           // Those number are virtual screen size, the viewport (used for
           // the check above) will be smaller with the browser’s interface.
-          useViewport = true
         }
       }
       else if (intensity == "viewport-all") {
@@ -64,6 +64,7 @@ if ('instantIntensity' in document.body.dataset) {
 init()
 
 function init() {
+  const isSupported = document.createElement('link').relList.supports('prefetch')
   // instant.page is meant to be loaded with <script type=module>
   // (though sometimes webmasters load it as a regular script).
   // So it’s normally executed (and must not cause JavaScript errors) in:
@@ -74,23 +75,19 @@ function init() {
   // The check below used to check for IntersectionObserverEntry.isIntersecting
   // but module scripts support implies this compatibility — except in Safari
   // 10.1–12.0, but this prefetch check takes care of it.
-  const isSupported = document.createElement('link').relList.supports('prefetch')
 
   if (!isSupported) {
     return
   }
 
+  const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
   // The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
   // unusable, as Chromium used to send a different `Accept` header.
   // It’s applied on all Shopify sites by default, as Shopify is very popular
   // and is the main source of this problem.
   // `window.Shopify` only exists on “classic” Shopify sites. Those using
   // Hydrogen (Remix SPA) aren’t concerned.
-  const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
 
-  // `navigator.userAgentData` is available in Chromium 90+,
-  // though it was not enabled for everyone at first.
-  // So it’s only reliable for Chromium ~100+, and only on HTTPS or localhost.
   if (navigator.userAgentData) {
     navigator.userAgentData.brands.forEach(({brand, version}) => {
       if (brand == 'Chromium') {
@@ -98,6 +95,9 @@ function init() {
       }
     })
   }
+  // `navigator.userAgentData` is available in Chromium 90+,
+  // though it was not enabled for everyone at first.
+  // So it’s only reliable for Chromium ~100+, and only on HTTPS or localhost.
 
   if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
     return
@@ -160,9 +160,9 @@ function init() {
 }
 
 function touchstartListener(event) {
+  lastTouchTimestamp = performance.now()
   /* Chrome on Android calls mouseover before touchcancel so `lastTouchTimestamp`
    * must be assigned on touchstart to be measured on mouseover. */
-  lastTouchTimestamp = performance.now()
 
   const anchorElement = event.target.closest('a')
 
@@ -179,13 +179,12 @@ function mouseoverListener(event) {
   }
 
   if (!('closest' in event.target)) {
+    return
     // Without this check sometimes an error “event.target.closest is not a function” is thrown, for unknown reasons
     // That error denotes that `event.target` isn’t undefined. My best guess is that it’s the Document.
-
+    //
     // Details could be gleaned from throwing such an error:
     //throw new TypeError(`instant.page non-element event target: timeStamp=${~~event.timeStamp}, type=${event.type}, typeof=${typeof event.target}, nodeType=${event.target.nodeType}, nodeName=${event.target.nodeName}, viewport=${innerWidth}x${innerHeight}, coords=${event.clientX}x${event.clientY}, scroll=${scrollX}x${scrollY}`)
-
-    return
   }
   const anchorElement = event.target.closest('a')
 
