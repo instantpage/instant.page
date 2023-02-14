@@ -55,6 +55,8 @@ function sha384(data) {
 }
 
 async function requestListener(req, res) {
+  console.log(`${req.url} -- ${req.headers['user-agent']}`)
+
   handleCookies(req)
 
   let headers = {
