@@ -13,7 +13,7 @@ const prefetches = new Set()
 //
 // The check below used to check for IntersectionObserverEntry.isIntersecting
 // but module scripts support implies this compatibility — except in Safari
-// 10.1–12.0, but the prefetch check takes care of it.
+// 10.1–12.0, but this prefetch check takes care of it.
 const isSupported = document.createElement('link').relList.supports('prefetch')
 
 const allowQueryString = 'instantAllowQueryString' in document.body.dataset
