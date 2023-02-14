@@ -28,7 +28,9 @@ if ('instantIntensity' in document.body.dataset) {
     }
   }
   else if (intensity.startsWith('viewport')) {
-    if (!(navigator.connection && (navigator.connection.saveData || (navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g'))))) {
+    const isNavigatorConnectionSaveDataEnabled = navigator.connection && navigator.connection.saveData
+    const isNavigatorConnectionLike2g = navigator.connection && navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g')
+    if (!isNavigatorConnectionSaveDataEnabled && !isNavigatorConnectionLike2g) {
       if (intensity == "viewport") {
         if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
           useViewport = true
