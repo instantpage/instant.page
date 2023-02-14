@@ -38,6 +38,10 @@ form label {
   padding: 5px;
 }
 
+form label:has(input:checked) {
+  background: hsl(0 0% 100% / .5);
+}
+
 @media (min-width: 1000px) {
   form label {
     display: inline-block;
