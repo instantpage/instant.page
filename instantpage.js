@@ -1,18 +1,15 @@
 /*! instant.page v5.1.1 - (C) 2019-2023 Alexandre Dieulot - https://instant.page/license */
 
-let _mouseoverTimer
-let _lastTouchTimestamp
-const _preloadedList = new Set()
-
-let _allowQueryString
-let _allowExternalLinks
-let _useWhitelist
+let _chromiumMajorVersionClientHint = null
+  , _allowQueryString
+  , _allowExternalLinks
+  , _useWhitelist
+  , _delayOnHover = 65
+  , _lastTouchTimestamp
+  , _mouseoverTimer
+  , _preloadedList = new Set()
 
 const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
-
-let _delayOnHover = 65
-
-let _chromiumMajorVersionClientHint = null
 
 init()
 
