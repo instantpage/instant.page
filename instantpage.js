@@ -4,10 +4,9 @@ let _mouseoverTimer
 let _lastTouchTimestamp
 const _prefetches = new Set()
 
-const allowQueryString = 'instantAllowQueryString' in document.body.dataset
-const allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
-const useWhitelist = 'instantWhitelist' in document.body.dataset
-const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
+let _allowQueryString
+let _allowExternalLinks
+let _useWhitelist
 
 const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
@@ -104,6 +103,11 @@ function init() {
   if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
     return
   }
+
+  const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
+  _allowQueryString = 'instantAllowQueryString' in document.body.dataset
+  _allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
+  _useWhitelist = 'instantWhitelist' in document.body.dataset
 
   const eventListenersOptions = {
     capture: true,
@@ -256,12 +260,12 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (useWhitelist && !('instant' in anchorElement.dataset)) {
+  if (_useWhitelist && !('instant' in anchorElement.dataset)) {
     return
   }
 
   if (anchorElement.origin != location.origin) {
-    let allowed = allowExternalLinks || 'instant' in anchorElement.dataset
+    let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
     if (!allowed || !chromiumMajorVersionClientHint) {
       // Chromium-only: see comment on “restrictive prefetch”
       return
@@ -276,7 +280,7 @@ function isPreloadable(anchorElement) {
     return
   }
 
-  if (!allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
+  if (!_allowQueryString && anchorElement.search && !('instant' in anchorElement.dataset)) {
     return
   }
 
