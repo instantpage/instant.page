@@ -12,7 +12,7 @@ const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
 let _delayOnHover = 65
 
-let chromiumMajorVersionClientHint = null
+let _chromiumMajorVersionClientHint = null
 
 init()
 
@@ -44,7 +44,7 @@ function init() {
   if (navigator.userAgentData) {
     navigator.userAgentData.brands.forEach(({brand, version}) => {
       if (brand == 'Chromium') {
-        chromiumMajorVersionClientHint = parseInt(version)
+        _chromiumMajorVersionClientHint = parseInt(version)
       }
     })
   }
@@ -52,7 +52,7 @@ function init() {
   // though it was not enabled for everyone at first.
   // So it’s only reliable for Chromium ~100+, and only on HTTPS or localhost.
 
-  if (handleVaryAcceptHeader && chromiumMajorVersionClientHint && chromiumMajorVersionClientHint < 110) {
+  if (handleVaryAcceptHeader && _chromiumMajorVersionClientHint && _chromiumMajorVersionClientHint < 110) {
     return
   }
 
@@ -266,7 +266,7 @@ function isPreloadable(anchorElement) {
 
   if (anchorElement.origin != location.origin) {
     let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
-    if (!allowed || !chromiumMajorVersionClientHint) {
+    if (!allowed || !_chromiumMajorVersionClientHint) {
       // Chromium-only: see comment on “restrictive prefetch”
       return
     }
