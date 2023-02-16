@@ -2,7 +2,7 @@
 
 let _mouseoverTimer
 let _lastTouchTimestamp
-const _prefetches = new Set()
+const _preloadedList = new Set()
 
 let _allowQueryString
 let _allowExternalLinks
@@ -296,7 +296,7 @@ function isPreloadable(anchorElement) {
 }
 
 function preload(url, fetchPriority = 'auto') {
-  if (_prefetches.has(url)) {
+  if (_preloadedList.has(url)) {
     return
   }
 
@@ -329,5 +329,5 @@ function preload(url, fetchPriority = 'auto') {
 
   document.head.appendChild(linkElement)
 
-  _prefetches.add(url)
+  _preloadedList.add(url)
 }
