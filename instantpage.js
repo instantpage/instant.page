@@ -22,7 +22,7 @@ function init() {
   // - Gecko in Firefox 60+
   // - WebKit in Safari 10.1+ (iOS 10.3+, macOS 10.10+)
   //
-  // The check below used to check for IntersectionObserverEntry.isIntersecting
+  // The check above used to check for IntersectionObserverEntry.isIntersecting
   // but module scripts support implies this compatibility — except in Safari
   // 10.1–12.0, but this prefetch check takes care of it.
 
