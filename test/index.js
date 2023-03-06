@@ -100,6 +100,10 @@ async function requestListener(req, res) {
       return ''
     })
 
+    const matches = content.match(/<body([^>]*)>/)
+    const openingBodyTagEscaped = matches[1].replace('<', '&lt;').replace('>', '&gt;')
+    content = content.replace('<inspag-body>', `<inspag-body>${openingBodyTagEscaped}`)
+
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
