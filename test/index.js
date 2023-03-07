@@ -103,6 +103,9 @@ async function requestListener(req, res) {
     const matches = content.match(/<body([^>]*)>/)
     const openingBodyTagEscaped = matches[1].replace('<', '&lt;').replace('>', '&gt;')
     content = content.replace('<inspag-body>', `<inspag-body>${openingBodyTagEscaped}`)
+    if (VARY_ACCEPT == 'Simulate Shopify') {
+      content = content.replace('</inspag-body>', ' (window.Shopify)</inspag-body>')
+    }
 
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
