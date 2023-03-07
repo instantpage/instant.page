@@ -120,8 +120,7 @@ async function requestListener(req, res) {
     content += `<a href="/${page}?${getRandomId()}" data-no-instant><span>Manually blacklisted link</span></a>`
     content += `<a href="/${page}?${getRandomId()}"><span>Non-whitelisted link</span></a>`
 
-    const openingTag = `<a href="/${page}?${getRandomId()}">`
-    content += `${openingTag}<span>Query string <small>${openingTag.replace('<', '&lt;').replace('>', '&gt;')}</small></span></a>`
+    content += makeAnchorElement('Query string', `<a href="/${page}?${getRandomId()}">`)
 
     content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
     content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
@@ -176,4 +175,22 @@ function sha384(data) {
 
 function getRandomId() {
   return crypto.randomUUID().split('-')[0]
+}
+
+function makeAnchorElement(text, openingTag) {
+  return `
+    ${openingTag}
+      <span>
+        ${text}
+        <small>${escapeHTMLTags(openingTag)}</small>
+      </span>
+    </a>
+  `
+}
+
+function escapeHTMLTags(html) {
+  const escaped = html
+    .replace('<', '&lt;')
+    .replace('>', '&gt;')
+  return escaped
 }
