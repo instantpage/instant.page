@@ -110,21 +110,19 @@ async function requestListener(req, res) {
     content += `<h1>Page ${page}</h1>`
     for (let i = 1; i <= 3; i++) {
       if (page != i) {
-        content += `<a href="/${i}?${getRandomId()}" ${dataInstantAttribute}><span>Page ${i}</span></a>`
+        content += makeAnchorElement(`Page ${i}`, `<a href="/${i}?${getRandomId()}" ${dataInstantAttribute}>`)
       }
     }
 
-    content += `<a href="/${page}?${getRandomId()}" target="_blank" ${dataInstantAttribute}><span>Opens in a new tab</span></a>`
-    content += `<a href="/${page}?${getRandomId()}#anchor" ${dataInstantAttribute}><span>Other page anchor</span></a>`
-    content += `<a href="${req.url}#anchor" id="anchor"><span>Same-page anchor</span></a>`
-    content += `<a href="/${page}?${getRandomId()}" data-no-instant><span>Manually blacklisted link</span></a>`
-    content += `<a href="/${page}?${getRandomId()}"><span>Non-whitelisted link</span></a>`
-
+    content += makeAnchorElement('Opens in a new tab', `<a href="/${page}?${getRandomId()}" target="_blank" ${dataInstantAttribute}>`)
+    content += makeAnchorElement('Other page anchor', `<a href="/${page}?${getRandomId()}#anchor" ${dataInstantAttribute}>`)
+    content += makeAnchorElement('Same-page anchor', `<a href="${req.url}#anchor" id="anchor">`)
+    content += makeAnchorElement('Manually blacklisted link', `<a href="/${page}?${getRandomId()}" data-no-instant>`)
+    content += makeAnchorElement('Non-whitelisted link', `<a href="/${page}?${getRandomId()}">`)
     content += makeAnchorElement('Query string', `<a href="/${page}?${getRandomId()}">`)
-
-    content += `<a href="https://www.google.com/" ${dataInstantAttribute}><span>External link</span></a>`
-    content += `<a><span>&lt;a&gt; without <code>href</code></span></a>`
-    content += `<a href="file:///C:/"><span>file: link</span></a>`
+    content += makeAnchorElement('External link', `<a href="https://www.google.com/" ${dataInstantAttribute}>`)
+    content += makeAnchorElement('&lt;a&gt; without <code>href</code>', `<a>`)
+    content += makeAnchorElement('file: link', `<a href="file:///C:/">`)
 
     const footerPath = new URL('footer.html', import.meta.url)
     let footer = await fs.readFile(footerPath)
