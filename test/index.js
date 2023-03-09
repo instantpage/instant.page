@@ -120,7 +120,8 @@ async function requestListener(req, res) {
     content += makeAnchorElement('Manually blacklisted link', `<a href="/${page}?${getRandomId()}" data-no-instant>`)
     content += makeAnchorElement('Non-whitelisted link', `<a href="/${page}?${getRandomId()}">`)
     content += makeAnchorElement('Query string', `<a href="/${page}?${getRandomId()}">`)
-    content += makeAnchorElement('External link', `<a href="https://www.google.com/" ${dataInstantAttribute}>`)
+    content += makeAnchorElement('External link', `<a href="https://www.google.com/">`)
+    content += makeAnchorElement('External link data-instant', `<a href="https://www.google.com/" data-instant>`)
     content += makeAnchorElement('&lt;a&gt; without <code>href</code>', `<a>`)
     content += makeAnchorElement('file: link', `<a href="file:///C:/">`)
 
