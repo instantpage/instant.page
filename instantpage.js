@@ -1,6 +1,6 @@
 /*! instant.page v5.1.1 - (C) 2019-2023 Alexandre Dieulot - https://instant.page/license */
 
-let _chromiumMajorVersionClientHint = null
+let _chromiumMajorVersionInUserAgent = null
   , _allowQueryString
   , _allowExternalLinks
   , _useWhitelist
@@ -38,18 +38,18 @@ function init() {
   // `window.Shopify` only exists on “classic” Shopify sites. Those using
   // Hydrogen (Remix SPA) aren’t concerned.
 
-  if (navigator.userAgentData) {
-    navigator.userAgentData.brands.forEach(({brand, version}) => {
-      if (brand == 'Chromium') {
-        _chromiumMajorVersionClientHint = parseInt(version)
-      }
-    })
+  const chromiumUserAgentIndex = navigator.userAgent.indexOf('Chrome/')
+  if (chromiumUserAgentIndex > -1) {
+    _chromiumMajorVersionInUserAgent = parseInt(navigator.userAgent.substring(chromiumUserAgentIndex + 'Chrome/'.length))
   }
-  // `navigator.userAgentData` is available in Chromium 90+,
-  // though it was not enabled for everyone at first.
-  // So it’s only reliable for Chromium ~100+, and only on HTTPS or localhost.
+  // The user agent client hints API is a theoretically more reliable way to
+  // get Chromium’s version… but it’s not available in Samsung Internet 20.
+  // It also requires a secure context, which would make debugging harder,
+  // and is only available in recent Chromium versions.
+  // In practice, Chromium browsers never shy from announcing "Chrome" in
+  // their regular user agent string, as that maximizes their compatibility.
 
-  if (handleVaryAcceptHeader && _chromiumMajorVersionClientHint && _chromiumMajorVersionClientHint < 110) {
+  if (handleVaryAcceptHeader && _chromiumMajorVersionInUserAgent && _chromiumMajorVersionInUserAgent < 110) {
     return
   }
 
@@ -263,7 +263,7 @@ function isPreloadable(anchorElement) {
 
   if (anchorElement.origin != location.origin) {
     let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
-    if (!allowed || !_chromiumMajorVersionClientHint) {
+    if (!allowed || !_chromiumMajorVersionInUserAgent) {
       // Chromium-only: see comment on “restrictive prefetch”
       return
     }
