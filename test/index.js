@@ -68,6 +68,10 @@ async function requestListener(req, res) {
     const headerPath = new URL('header.html', import.meta.url)
     content += await fs.readFile(headerPath)
 
+    const stylesheetPath = new URL('stylesheet.css', import.meta.url)
+    const stylesheet = await fs.readFile(stylesheetPath, {encoding: 'utf-8'})
+    content = content.replace('<link rel="stylesheet" href="-">', `<style>\n${stylesheet.trim()}\n</style>`)
+
     if (ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS) {
       content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
     }
