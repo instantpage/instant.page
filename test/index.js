@@ -56,7 +56,7 @@ async function requestListener(req, res) {
   }
   else if (pathString == 'favicon.ico') {
     headers['Content-Type'] = 'image/svg+xml'
-    const faviconPath = new URL('favicon.svg', import.meta.url)
+    const faviconPath = new URL('client/favicon.svg', import.meta.url)
     const favicon = await fs.readFile(faviconPath)
     content = favicon
   }
@@ -71,10 +71,10 @@ async function requestListener(req, res) {
       headers['Vary'] = 'Accept'
     }
 
-    const headerPath = new URL('header.html', import.meta.url)
+    const headerPath = new URL('client/header.html', import.meta.url)
     content += await fs.readFile(headerPath)
 
-    const stylesheetPath = new URL('stylesheet.css', import.meta.url)
+    const stylesheetPath = new URL('client/stylesheet.css', import.meta.url)
     const stylesheet = await fs.readFile(stylesheetPath, {encoding: 'utf-8'})
     content = content.replace('<link rel="stylesheet" href="-">', `<style>\n${stylesheet.trim()}\n</style>`)
 
@@ -135,7 +135,7 @@ async function requestListener(req, res) {
     content += makeAnchorElement('&lt;a&gt; without <code>href</code>', `<a>`)
     content += makeAnchorElement('file: link', `<a href="file:///C:/">`)
 
-    const footerPath = new URL('footer.html', import.meta.url)
+    const footerPath = new URL('client/footer.html', import.meta.url)
     let footer = await fs.readFile(footerPath)
     footer = footer.toString().replace('__HASH__', jsHash)
     content += footer
