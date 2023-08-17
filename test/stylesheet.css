@@ -1,7 +1,37 @@
 body {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "nav";
+  gap: 8px;
+
   background: lightskyblue;
   overflow-y: scroll;
   font-family: system-ui, sans-serif;
+}
+
+@media (min-width: 1000px) {
+  body {
+    grid-template-areas:
+      "nav header"
+      "nav main";
+  }
+}
+
+form {
+  grid-area: header;
+}
+
+nav {
+  grid-area: nav;
+  max-width: 250px;
+
+  background-color: hsl(0 0% 100% / .375);
+}
+
+main {
+  grid-area: main;
 }
 
 a {
