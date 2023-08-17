@@ -52,7 +52,12 @@ async function requestListener(req, res) {
 
   if (pathString == 'instantpage.js') {
     headers['Content-Type'] = 'text/javascript'
-    content += jsContent
+    content = jsContent
+  }
+  else if (['click-test.js', 'form-options.js'].includes(pathString)) {
+    headers['Content-Type'] = 'text/javascript'
+    const path = new URL(`client/${pathString}`, import.meta.url)
+    content = await fs.readFile(path)
   }
   else if (pathString == 'favicon.ico') {
     headers['Content-Type'] = 'image/svg+xml'
