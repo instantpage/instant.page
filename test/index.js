@@ -54,6 +54,12 @@ async function requestListener(req, res) {
     headers['Content-Type'] = 'text/javascript'
     content += jsContent
   }
+  else if (pathString == 'favicon.ico') {
+    headers['Content-Type'] = 'image/svg+xml'
+    const faviconPath = new URL('favicon.svg', import.meta.url)
+    const favicon = await fs.readFile(faviconPath)
+    content = favicon
+  }
   else if (!isNaN(page)) {
     await sleep(SLEEP_TIME)
 
