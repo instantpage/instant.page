@@ -30,6 +30,12 @@ nav {
   background-color: hsl(0 0% 100% / .375);
 }
 
+nav a {
+  display: block;
+
+  padding-block: .125em;
+}
+
 main {
   grid-area: main;
 }
