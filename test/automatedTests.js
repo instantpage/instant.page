@@ -82,13 +82,13 @@ async function handlePostData(req, res) {
   })
 
   const testPath = new URL(req.headers.referer).pathname
-  const {checkExpectation} = await getConfig(testPath)
+  const {title, checkExpectation} = await getConfig(testPath)
   const isResultAsExpected = checkExpectation(data)
   if (isResultAsExpected) {
-    console.log(`✅ ok!`)
+    console.log(`✅ Succeeded!  “${title}”`)
   }
   else {
-    console.log(`❌ BAD`)
+    console.log(`❌ FAILED  “${title}”`)
     console.log(data)
     console.log(checkExpectation.toString())
   }
