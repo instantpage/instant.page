@@ -25,7 +25,7 @@ form {
 
 nav {
   grid-area: nav;
-  max-width: 250px;
+  inline-size: 250px;
 
   background-color: hsl(0 0% 100% / .375);
 }
@@ -34,7 +34,7 @@ main {
   grid-area: main;
 }
 
-a {
+main a {
   display: block;
   background: hsla(0, 0%, 100%, .25);
   padding: .5em;
@@ -45,15 +45,15 @@ a {
   font-size: 1.5em;
 }
 
-a:hover {
+main a:hover {
   border-color: hsla(0, 0%, 100%, 1);
 }
 
-a:active {
+main a:active {
   background: hsla(0, 0%, 0%, .25);
 }
 
-a small {
+main a small {
   font-size: .75em;
   opacity: .75;
 }

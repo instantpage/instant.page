@@ -3,6 +3,8 @@ import fs from 'node:fs/promises'
 import crypto from 'node:crypto'
 import util from 'node:util'
 
+import * as automatedTests from './automatedTests.js'
+
 const sleep = util.promisify(setTimeout)
 
 let PORT = parseInt(process.argv[2])
@@ -29,8 +31,11 @@ async function requestListener(req, res) {
   const isPrefetched = req.headers['x-moz'] == 'prefetch' /* Firefox 109 */ || req.headers['purpose'] == 'prefetch' /* Chrome 110 & Safari 16.3 */
   const prefetchIndicator = isPrefetched ? 'PF' : ' F'
   const type = req.headers['sec-fetch-dest'] ? req.headers['sec-fetch-dest'].toUpperCase()[0] : '.'
-  const spaces = ' '.repeat(Math.max(0, 15 - req.url.length))
-  console.log(`${prefetchIndicator} ${type} ${req.url} ${spaces}${req.headers['user-agent']}`)
+  const spaces = ' '.repeat(Math.max(0, 16 - req.url.length))
+  const date = new Date
+  const dateTime = date.toLocaleTimeString('en-US', { hour12: false })
+  const dateMilliseconds = String(date.getMilliseconds()).padStart(3, '0')
+  console.log(`${dateTime}.${dateMilliseconds} ${prefetchIndicator}  ${type}  ${req.url} ${spaces}  ${req.headers['user-agent']}`)
 
   handleCookies(req)
 
@@ -65,6 +70,9 @@ async function requestListener(req, res) {
     const favicon = await fs.readFile(faviconPath)
     content = favicon
   }
+  else if (pathString.startsWith('tests/')) {
+    return automatedTests.servePage(req, res)
+  }
   else if (!isNaN(page)) {
     await sleep(SLEEP_TIME)
 
@@ -77,7 +85,9 @@ async function requestListener(req, res) {
     }
 
     const headerPath = new URL('client/header.html', import.meta.url)
-    content += await fs.readFile(headerPath)
+    const headerTemplate = await fs.readFile(headerPath, {encoding: 'utf8'})
+    const header = await fillHeaderWithTests(headerTemplate)
+    content += header
 
     const stylesheetPath = new URL('client/stylesheet.css', import.meta.url)
     const stylesheet = await fs.readFile(stylesheetPath, {encoding: 'utf-8'})
@@ -207,4 +217,33 @@ function escapeHTMLTags(html) {
     .replace('<', '&lt;')
     .replace('>', '&gt;')
   return escaped
+}
+
+async function fillHeaderWithTests(header) {
+  const tests = []
+  const path = new URL('tests', import.meta.url)
+  const dir = await fs.readdir(path)
+  for (const testDir of dir) {
+    if (testDir == '_template') {
+      continue
+    }
+
+    const path = new URL(`tests/${testDir}/config.js`, import.meta.url)
+
+    let testConfig
+    try {
+      testConfig = await import(path)
+    }
+    catch (e) {
+      console.log(e.message)
+      continue
+    }
+
+    tests.push({testDir, ...testConfig})
+  }
+
+  let testsHtml = tests.map((value) => `<a href="/tests/${value.testDir}/index.html" data-no-instant>${value.title} → ${value.expectation}</a>`)
+  header = header.replace('<nav></nav>', `<nav>${testsHtml}</nav>`)
+
+  return header
 }
