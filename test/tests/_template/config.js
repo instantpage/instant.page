@@ -5,8 +5,6 @@ export const environment = {
   //cacheMaxAge: false,
 }
 
-export const expectation = ''
-
 export function checkExpectation(data) {
   return false
 }

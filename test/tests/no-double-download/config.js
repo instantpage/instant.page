@@ -5,8 +5,6 @@ export const environment = {
   cacheMaxAge: 2,
 }
 
-export const expectation = 'No double download'
-
 export function checkExpectation(data) {
   return data.transferSize === 0
 }
