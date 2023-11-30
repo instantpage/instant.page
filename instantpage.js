@@ -198,11 +198,12 @@ function mouseoverListener(event) {
 
   anchorElement.addEventListener('mouseout', mouseoutListener, {passive: true})
 
-  clearTimeout(_mouseoverTimer); //sometimes mouseover triggers a few times before mouseout, setting multiple timeouts but then mouseout only clears the last timeout.
-  _mouseoverTimer = setTimeout(() => {
-    preload(anchorElement.href, 'high')
-    _mouseoverTimer = undefined
-  }, _delayOnHover)
+  if (!_mouseoverTimer) { //sometimes mouseover triggers a few times before mouseout, setting multiple timeouts but then mouseout only clears the last timeout.
+    _mouseoverTimer = setTimeout(() => {
+      preload(anchorElement.href, 'high')
+      _mouseoverTimer = undefined
+    }, _delayOnHover)
+  }
 }
 
 function mousedownListener(event) {
