@@ -293,9 +293,19 @@ function isPreloadable(anchorElement) {
 }
 
 function preload(url, fetchPriority = 'auto') {
-  if (_preloadedList.has(url)) {
+  const prefetchExists = document.querySelector(`link[rel="prefetch"][href="${url}"]`)
+  if (_preloadedList.has(url) || prefetchExists) {
     return
   }
+  // It happens that the link tag with the prefetch attribute for the link 
+  // has already been set for critical pages by other plugins 
+  // and was originally in the document. Therefore, such links 
+  // have already been downloaded and saved in the browser cache, 
+  // and they do not need to be re-downloaded when hovering over the link. 
+  // After all, this forces you to delete the cache from the first request 
+  // and forces you to load the page again. And the click may occur before 
+  // the re-upload is completed. And we will regret that we deleted the first download. 
+  // Therefore, it is better to avoid deleting already downloaded pages.
 
   const linkElement = document.createElement('link')
   linkElement.rel = 'prefetch'

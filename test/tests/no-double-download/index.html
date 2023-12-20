@@ -1,0 +1,16 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>.</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<a href="2.html">.</a>
+
+<script>
+addEventListener('load', async (event, constants, environment) => {
+  const $a = document.querySelector('a')
+  $a.dispatchEvent(new MouseEvent('mouseover'))
+  await new Promise(_ => setTimeout(_, constants.INSTANTPAGE_HOVER_DELAY + environment.pageLoadTime / 2))
+  $a.click()
+})
+</script>
+<script src="../instantpage.js" type="module"></script>

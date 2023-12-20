@@ -3,6 +3,8 @@ import fs from 'node:fs/promises'
 import crypto from 'node:crypto'
 import util from 'node:util'
 
+import * as automatedTests from './automatedTests.js'
+
 const sleep = util.promisify(setTimeout)
 
 let PORT = parseInt(process.argv[2])
@@ -29,8 +31,11 @@ async function requestListener(req, res) {
   const isPrefetched = req.headers['x-moz'] == 'prefetch' /* Firefox 109 */ || req.headers['purpose'] == 'prefetch' /* Chrome 110 & Safari 16.3 */
   const prefetchIndicator = isPrefetched ? 'PF' : ' F'
   const type = req.headers['sec-fetch-dest'] ? req.headers['sec-fetch-dest'].toUpperCase()[0] : '.'
-  const spaces = ' '.repeat(Math.max(0, 15 - req.url.length))
-  console.log(`${prefetchIndicator} ${type} ${req.url} ${spaces}${req.headers['user-agent']}`)
+  const spaces = ' '.repeat(Math.max(0, 16 - req.url.length))
+  const date = new Date
+  const dateTime = date.toLocaleTimeString('en-US', { hour12: false })
+  const dateMilliseconds = String(date.getMilliseconds()).padStart(3, '0')
+  console.log(`${dateTime}.${dateMilliseconds} ${prefetchIndicator}  ${type}  ${req.url} ${spaces}  ${req.headers['user-agent']}`)
 
   handleCookies(req)
 
@@ -52,7 +57,21 @@ async function requestListener(req, res) {
 
   if (pathString == 'instantpage.js') {
     headers['Content-Type'] = 'text/javascript'
-    content += jsContent
+    content = jsContent
+  }
+  else if (['click-test.js', 'form-options.js'].includes(pathString)) {
+    headers['Content-Type'] = 'text/javascript'
+    const path = new URL(`client/${pathString}`, import.meta.url)
+    content = await fs.readFile(path)
+  }
+  else if (pathString == 'favicon.ico') {
+    headers['Content-Type'] = 'image/svg+xml'
+    const faviconPath = new URL('client/favicon.svg', import.meta.url)
+    const favicon = await fs.readFile(faviconPath)
+    content = favicon
+  }
+  else if (pathString.startsWith('tests/')) {
+    return automatedTests.servePage(req, res)
   }
   else if (!isNaN(page)) {
     await sleep(SLEEP_TIME)
@@ -65,8 +84,14 @@ async function requestListener(req, res) {
       headers['Vary'] = 'Accept'
     }
 
-    const headerPath = new URL('header.html', import.meta.url)
-    content += await fs.readFile(headerPath)
+    const headerPath = new URL('client/header.html', import.meta.url)
+    const headerTemplate = await fs.readFile(headerPath, {encoding: 'utf8'})
+    const header = await fillHeaderWithTests(headerTemplate)
+    content += header
+
+    const stylesheetPath = new URL('client/stylesheet.css', import.meta.url)
+    const stylesheet = await fs.readFile(stylesheetPath, {encoding: 'utf-8'})
+    content = content.replace('<link rel="stylesheet" href="-">', `<style>\n${stylesheet.trim()}\n</style>`)
 
     if (ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS) {
       content = content.replace('<body>', '<body data-instant-allow-query-string data-instant-allow-external-links>')
@@ -125,7 +150,7 @@ async function requestListener(req, res) {
     content += makeAnchorElement('&lt;a&gt; without <code>href</code>', `<a>`)
     content += makeAnchorElement('file: link', `<a href="file:///C:/">`)
 
-    const footerPath = new URL('footer.html', import.meta.url)
+    const footerPath = new URL('client/footer.html', import.meta.url)
     let footer = await fs.readFile(footerPath)
     footer = footer.toString().replace('__HASH__', jsHash)
     content += footer
@@ -192,4 +217,33 @@ function escapeHTMLTags(html) {
     .replace('<', '&lt;')
     .replace('>', '&gt;')
   return escaped
+}
+
+async function fillHeaderWithTests(header) {
+  const tests = []
+  const path = new URL('tests', import.meta.url)
+  const dir = await fs.readdir(path)
+  for (const testDir of dir) {
+    if (testDir == '_template') {
+      continue
+    }
+
+    const path = new URL(`tests/${testDir}/config.js`, import.meta.url)
+
+    let testConfig
+    try {
+      testConfig = await import(path)
+    }
+    catch (e) {
+      console.log(e.message)
+      continue
+    }
+
+    tests.push({testDir, ...testConfig})
+  }
+
+  let testsHtml = tests.map((value) => `<a href="/tests/${value.testDir}/index.html" data-no-instant>${value.title}</a>`).join('\n')
+  header = header.replace('<nav></nav>', `<nav>${testsHtml}</nav>`)
+
+  return header
 }
