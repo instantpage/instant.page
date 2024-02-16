@@ -1,0 +1,88 @@
+<!--
+Benchmark created to test if finding a specific attribute on any script element
+is fast enough, for v6’s data-instant-config attribute, because module scripts
+don’t have `document.currentScript`.
+
+A phone with a MT6580 chip (as found in most €50 phones from 2015-2020) takes
+0.3 ms with 100 script tags using document.querySelector on Chrome 121.
+That’s acceptable.
+
+document.scripts iteration happens to be slower.
+-->
+<!doctype html>
+<title>benckmark-find-module-script-tag-attribute</title>
+<meta name="viewport" content="width=device-width">
+
+<form>
+  Try with
+  <input inputmode="numeric" name="number" value="100" style="font-size: inherit">
+  script tags.
+
+  <fieldset style="margin-block: .5em">
+    <legend>Strategy</legend>
+    <label style="display: block; padding-block: .5em">
+      <input type="radio" name="strategy" value="querySelector" checked> querySelector
+    </label>
+    <label style="display: block; padding-block: .5em">
+      <input type="radio" name="strategy" value="document.scripts"> document.scripts iteration
+    </label>
+  </fieldset>
+
+  <input type="submit" value="Go" style="padding: 1em 3em">
+
+  <output style="display: block; font-size: 2rem"></output>
+</form>
+
+<script>
+const urlParams = new URLSearchParams(location.search)
+const number = parseInt(urlParams.get('number'))
+const strategy = urlParams.get('strategy')
+
+if (strategy) {
+  document.querySelector(`input[name="strategy"][value="${strategy}"]`).checked = true
+}
+
+if (!isNaN(number)) {
+  document.querySelector('input[name="number"]').value = number
+
+  for (let i = 0; i < number; i++) {
+    const $script = document.createElement('script')
+    const $container = document[i % 2 ? 'body' : 'head']
+    $container.append($script)
+  }
+
+  const $needle = document.createElement('script')
+  $needle.dataset.instantConfig = '!'
+  document.body.append($needle)
+
+  if (strategy == 'document.scripts') {
+    const startTime = performance.now()
+    const length = document.scripts.length // caching this value is useful (tested on Firefox 115, Chromium 121, Safari 17.3.1)
+    for (let i = 0; i < length; i++) {
+      if ('instantConfig' in document.scripts[i].dataset) {
+        const endTime = performance.now()
+        if (document.scripts[i] != $needle) {
+          throw 'doesn’t match'
+        }
+        got_it(startTime, endTime)
+        break
+      }
+    }
+  }
+  else if (strategy == 'querySelector') {
+    const startTime = performance.now()
+    $match = document.querySelector('script[data-instant-config]')
+    const endTime = performance.now()
+    if ($match != $needle) {
+      throw 'doesn’t match'
+    }
+    got_it(startTime, endTime)
+  }
+}
+
+function got_it(startTime, endTime) {
+  const measure = endTime - startTime
+  const measureLegible = measure.toLocaleString('en-US', {minimumFractionDigits: 1, maximumFractionDigits: 1})
+  document.querySelector('output').innerText = `${measureLegible} ms`
+}
+</script>
