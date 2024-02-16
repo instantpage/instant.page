@@ -11,9 +11,24 @@ let _chromiumMajorVersionInUserAgent = null
 
 const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
-init()
+main()
 
-function init() {
+function main() {
+  const $currentScript = document.querySelector('script[data-instant-config]')
+  // `document.currentScript` isn’t available in module scripts.
+  // We use `data-instant-config` instead of just `data-config` with a check on
+  // `import.meta.url` and scripts’ `src` because what becomes of `import.meta.url`
+  // is uncertain when going through bundlers.
+  // For instance, `esbuild --bundle --format=esm` will make an imported module’s
+  // `import.meta.url` the entrypoint’s url, while the entrypoint script tag
+  // might use an unrelated `data-config`, causing a mess.
+  if ($currentScript) {
+    const config = $currentScript.dataset.instantConfig
+    init(config)
+  }
+}
+
+function init(unusedConfig) {
   const isSupported = document.createElement('link').relList.supports('prefetch')
   // instant.page is meant to be loaded with <script type=module>
   // (though sometimes webmasters load it as a regular script).
@@ -327,4 +342,8 @@ function preload(url, fetchPriority = 'auto') {
   document.head.appendChild(linkElement)
 
   _preloadedList.add(url)
+}
+
+export {
+  init,
 }
