@@ -12,6 +12,7 @@ addEventListener('load', async (event) => {
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       transferSize: navigationPerformanceEntry.transferSize,
+      deliveryType: navigationPerformanceEntry.deliveryType,
     }),
   })
 
