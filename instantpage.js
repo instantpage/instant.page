@@ -56,7 +56,7 @@ function init() {
 
   _speculationRulesType = 'none'
   if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
-    const speculationRulesConfig = document.body.dataset.instantSpecrules;
+    const speculationRulesConfig = document.body.dataset.instantSpecrules
     if (speculationRulesConfig == 'prerender') {
       _speculationRulesType = 'prerender'
     } else if (speculationRulesConfig != 'no') {
