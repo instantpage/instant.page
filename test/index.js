@@ -30,7 +30,7 @@ function init() {
 async function requestListener(req, res) {
   const isPrefetched = req.headers['x-moz'] == 'prefetch' /* Firefox 109 */ ||
                        req.headers['purpose'] == 'prefetch' /* Chrome 110 & Safari 16.3 */ ||
-                       req.headers['sec-purpose'].startsWith('prefetch') /* Chrome 110 speculation rules */
+                       req.headers['sec-purpose']?.startsWith('prefetch') /* Chrome 110 speculation rules */
   const prefetchIndicator = isPrefetched ? 'PF' : ' F'
   const type = req.headers['sec-fetch-dest'] ? req.headers['sec-fetch-dest'].toUpperCase()[0] : '.'
   const spaces = ' '.repeat(Math.max(0, 16 - req.url.length))
