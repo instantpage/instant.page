@@ -1,6 +1,7 @@
 /*! instant.page v5.2.0 - (C) 2019-2023 Alexandre Dieulot - https://instant.page/license */
 
 let _chromiumMajorVersionInUserAgent = null
+  , _speculationRulesType
   , _allowQueryString
   , _allowExternalLinks
   , _useWhitelist
@@ -51,6 +52,16 @@ function init() {
 
   if (handleVaryAcceptHeader && _chromiumMajorVersionInUserAgent && _chromiumMajorVersionInUserAgent < 110) {
     return
+  }
+
+  _speculationRulesType = 'none'
+  if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+    const speculationRulesConfig = document.body.dataset.instantSpecrules;
+    if (speculationRulesConfig == 'prerender') {
+      _speculationRulesType = 'prerender'
+    } else if (speculationRulesConfig != 'no') {
+      _speculationRulesType = 'prefetch'
+    }
   }
 
   const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
@@ -264,7 +275,7 @@ function isPreloadable(anchorElement) {
   if (anchorElement.origin != location.origin) {
     let allowed = _allowExternalLinks || 'instant' in anchorElement.dataset
     if (!allowed || !_chromiumMajorVersionInUserAgent) {
-      // Chromium-only: see comment on “restrictive prefetch”
+      // Chromium-only: see comment on “restrictive prefetch” and “cross-site speculation rules prefetch”
       return
     }
   }
@@ -297,6 +308,34 @@ function preload(url, fetchPriority = 'auto') {
     return
   }
 
+  if (_speculationRulesType != 'none') {
+    preloadUsingSpeculationRules(url)
+  } else {
+    preloadUsingLinkElement(url, fetchPriority)
+  }
+
+  _preloadedList.add(url)
+}
+
+function preloadUsingSpeculationRules(url) {
+  const scriptElement = document.createElement('script')
+  scriptElement.type = 'speculationrules'
+
+  scriptElement.textContent = JSON.stringify({
+    [_speculationRulesType]: [{
+      source: 'list',
+      urls: [url]
+    }]
+  })
+
+  // When using speculation rules, cross-site prefetch is supported, but will
+  // only work if the user has no cookies for the destination site. The
+  // prefetch will not be sent, if the user does have such cookies.
+
+  document.head.appendChild(scriptElement)
+}
+
+function preloadUsingLinkElement(url, fetchPriority = 'auto') {
   const linkElement = document.createElement('link')
   linkElement.rel = 'prefetch'
   linkElement.href = url
@@ -325,6 +364,4 @@ function preload(url, fetchPriority = 'auto') {
   // event, but might be bad when prefetching every link in the viewport.
 
   document.head.appendChild(linkElement)
-
-  _preloadedList.add(url)
 }

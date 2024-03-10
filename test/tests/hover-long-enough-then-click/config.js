@@ -6,5 +6,5 @@ export const environment = {
 }
 
 export function checkExpectation(data) {
-  return data.transferSize === 0
+  return data.transferSize === 0 || data.deliveryType === 'navigational-prefetch'
 }
