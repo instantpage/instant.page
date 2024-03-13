@@ -64,7 +64,7 @@ function init() {
     }
   }
 
-  const mousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
+  const useMousedownShortcut = 'instantMousedownShortcut' in document.body.dataset
   _allowQueryString = 'instantAllowQueryString' in document.body.dataset
   _allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
   _useWhitelist = 'instantWhitelist' in document.body.dataset
@@ -74,70 +74,74 @@ function init() {
     passive: true,
   }
 
-  let useMousedown = false
-  let useMousedownOnly = false
-  let useViewport = false
+  let preloadOnMousedown = false
+  let preloadOnlyOnMousedown = false
+  let preloadWhenVisible = false
   if ('instantIntensity' in document.body.dataset) {
-    const intensity = document.body.dataset.instantIntensity
+    const intensityParameter = document.body.dataset.instantIntensity
 
-    if (intensity.startsWith('mousedown')) {
-      useMousedown = true
-      if (intensity == 'mousedown-only') {
-        useMousedownOnly = true
-      }
+    if (intensityParameter == 'mousedown' && !useMousedownShortcut) {
+      preloadOnMousedown = true
     }
-    else if (intensity.startsWith('viewport')) {
+
+    if (intensityParameter == 'mousedown-only' && !useMousedownShortcut) {
+      preloadOnMousedown = true
+      preloadOnlyOnMousedown = true
+    }
+
+    if (intensityParameter == 'viewport') {
+      const isOnSmallScreen = document.documentElement.clientWidth * document.documentElement.clientHeight < 450000
+      // Smartphones are the most likely to have a slow connection, and
+      // their small screen size limits the number of links (and thus
+      // server load).
+      //
+      // Foldable phones (being expensive as of 2023), tablets and PCs
+      // generally have a decent connection, and a big screen displaying
+      // more links that would put more load on the server.
+      //
+      // iPhone 14 Pro Max (want): 430×932 = 400 760
+      // Samsung Galaxy S22 Ultra with display size set to 80% (want):
+      // 450×965 = 434 250
+      // Small tablet (don’t want): 600×960 = 576 000
+      // Those number are virtual screen size, the viewport (used for
+      // the check above) will be smaller with the browser’s interface.
+
       const isNavigatorConnectionSaveDataEnabled = navigator.connection && navigator.connection.saveData
       const isNavigatorConnectionLike2g = navigator.connection && navigator.connection.effectiveType && navigator.connection.effectiveType.includes('2g')
-      if (!isNavigatorConnectionSaveDataEnabled && !isNavigatorConnectionLike2g) {
-        if (intensity == "viewport") {
-          if (document.documentElement.clientWidth * document.documentElement.clientHeight < 450000) {
-            useViewport = true
-            // Smartphones are the most likely to have a slow connection, and
-            // their small screen size limits the number of links (and thus
-            // server load).
-            //
-            // Foldable phones (being expensive as of 2023), tablets and PCs
-            // generally have a decent connection, and a big screen displaying
-            // more links that would put more load on the server.
-            //
-            // iPhone 14 Pro Max (want): 430×932 = 400 760
-            // Samsung Galaxy S22 Ultra with display size set to 80% (want):
-            // 450×965 = 434 250
-            // Small tablet (don’t want): 600×960 = 576 000
-            // Those number are virtual screen size, the viewport (used for
-            // the check above) will be smaller with the browser’s interface.
-          }
-        }
-        else if (intensity == "viewport-all") {
-          useViewport = true
-        }
+      const isNavigatorConnectionAdequate = !isNavigatorConnectionSaveDataEnabled && !isNavigatorConnectionLike2g
+
+      if (isOnSmallScreen && isNavigatorConnectionAdequate) {
+        preloadWhenVisible = true
       }
     }
-    else {
-      const milliseconds = parseInt(intensity)
-      if (!isNaN(milliseconds)) {
-        _delayOnHover = milliseconds
-      }
+
+    if (intensityParameter == 'viewport-all') {
+      preloadWhenVisible = true
+    }
+
+    const intensityAsInteger = parseInt(intensityParameter)
+    if (!isNaN(intensityAsInteger)) {
+      _delayOnHover = intensityAsInteger
     }
   }
 
-  if (!useMousedownOnly) {
+  if (!preloadOnlyOnMousedown) {
     document.addEventListener('touchstart', touchstartListener, eventListenersOptions)
   }
 
-  if (!useMousedown) {
+  if (!preloadOnMousedown) {
     document.addEventListener('mouseover', mouseoverListener, eventListenersOptions)
   }
-  else if (!mousedownShortcut) {
-      document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
+
+  if (preloadOnMousedown) {
+    document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
   }
 
-  if (mousedownShortcut) {
+  if (useMousedownShortcut) {
     document.addEventListener('mousedown', mousedownShortcutListener, eventListenersOptions)
   }
 
-  if (useViewport) {
+  if (preloadWhenVisible) {
     let requestIdleCallbackOrFallback = window.requestIdleCallback
     // Safari has no support as of 16.3: https://webkit.org/b/164193
     if (!requestIdleCallbackOrFallback) {
