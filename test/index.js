@@ -245,7 +245,7 @@ async function fillHeaderWithTests(header) {
   }
 
   let testsHtml = tests.map((value) => `<a href="/tests/${value.testDir}/index.html" data-no-instant>${value.title}</a>`).join('\n')
-  header = header.replace('<nav></nav>', `<nav>${testsHtml}</nav>`)
+  header = header.replace('<nav-content></nav-content>', testsHtml)
 
   return header
 }

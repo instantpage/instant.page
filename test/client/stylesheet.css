@@ -30,6 +30,14 @@ nav {
   background-color: hsl(0 0% 100% / .375);
 }
 
+nav header {
+  margin-block: .5em;
+}
+
+nav header * {
+  margin-block: .15em;
+}
+
 nav a {
   display: block;
 
