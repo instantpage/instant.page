@@ -13,7 +13,9 @@ let _chromiumMajorVersionInUserAgent = null
 init()
 
 function init() {
-  const isSupported = document.createElement('link').relList.supports('prefetch')
+  const supportCheckRelList = document.createElement('link').relList
+  const isSupported = supportCheckRelList.supports('prefetch')
+    && supportCheckRelList.supports('modulepreload')
   // instant.page is meant to be loaded with <script type=module>
   // (though sometimes webmasters load it as a regular script).
   // So it’s normally executed (and must not cause JavaScript errors) in:
@@ -24,6 +26,13 @@ function init() {
   // The check above used to check for IntersectionObserverEntry.isIntersecting
   // but module scripts support implies this compatibility — except in Safari
   // 10.1–12.0, but this prefetch check takes care of it.
+  //
+  // The modulepreload check is used to drop support for Firefox < 115 in order
+  // to lessen maintenance.
+  // This implies Safari 17+ (if it supported prefetch), if we ever support
+  // fetch()-based preloading for Safari we might want to OR that check with
+  // something that Safari 15.4 or 16.4 supports.
+  // Also implies Chromium 66+.
 
   if (!isSupported) {
     return
