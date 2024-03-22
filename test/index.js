@@ -101,7 +101,8 @@ async function requestListener(req, res) {
     if (USE_WHITELIST) {
       content = content.replace('<body', '<body data-instant-whitelist')
     }
-    else if (INTENSITY != 65) {
+
+    if (INTENSITY != 65) {
       content = content.replace('<body', `<body data-instant-intensity="${INTENSITY}"`)
     }
     const dataInstantAttribute = !ALLOW_QUERY_STRING_AND_EXTERNAL_LINKS || USE_WHITELIST ? `data-instant` : ``
