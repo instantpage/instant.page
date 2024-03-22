@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>touch vs other events delay</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+a {
+  font-size: xx-large;
+  background-color: aliceblue;
+  padding: .25em .5em;
+  display: inline-block;
+}
+
+table {
+  font-family: monospace;
+}
+
+thead th,
+tbody td {
+  padding-inline: .25em;
+}
+
+tbody td:not(:first-child) {
+  text-align: end;
+}
+
+tbody td:nth-child(3) {
+  font-weight: bold;
+}
+</style>
+
+<a href="#">Link</a>
+
+<p>Tap, or hold, to see the delay between touchstart and some other events.
+
+<table>
+  <thead>
+    <tr>
+      <th>event
+      <th>perf.now
+      <th>diff
+      <th>eventTS
+      <th>diff2
+  <tbody>
+</table>
+
+<script>
+let _lastTouchTimestamp
+let _lastTouchTimestamp2
+const eventListenersOptions = {
+  capture: true,
+  passive: true,
+}
+addEventListener('touchstart', listener, eventListenersOptions)
+addEventListener('touchcancel', listener, eventListenersOptions)
+addEventListener('mouseover', listener, eventListenersOptions)
+addEventListener('mousedown', listener, eventListenersOptions)
+addEventListener('mouseout', listener, eventListenersOptions)
+addEventListener('click', listener, eventListenersOptions)
+
+function listener(event) {
+  const perfnow = performance.now()
+
+  if (event.target.tagName !== 'A') {
+    return
+  }
+
+  console.log(event)
+
+  if (event.type === 'touchstart') {
+    _lastTouchTimestamp = perfnow
+    _lastTouchTimestamp2 = event.timeStamp
+  }
+
+  const numberFormatOptions = {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }
+  const perfTimeStamp = perfnow.toLocaleString('en-US', numberFormatOptions)
+  const eventTimeStamp = event.timeStamp.toLocaleString('en-US', numberFormatOptions)
+  const diff = (perfnow - _lastTouchTimestamp).toLocaleString('en-US', numberFormatOptions)
+  const diff2 = (event.timeStamp - _lastTouchTimestamp2).toLocaleString('en-US', numberFormatOptions)
+
+  const html = `<td>${event.type}<td>${perfTimeStamp}<td>${diff}<td>${eventTimeStamp}<td>${diff2}`
+  $tr = document.createElement('tr')
+  $tr.innerHTML = html
+  document.querySelector('tbody').append($tr)
+}
+</script>

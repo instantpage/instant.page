@@ -6,11 +6,9 @@ let _chromiumMajorVersionInUserAgent = null
   , _allowExternalLinks
   , _useWhitelist
   , _delayOnHover = 65
-  , _lastTouchTimestamp
+  , _lastTouchstartEvent
   , _mouseoverTimer
   , _preloadedList = new Set()
-
-const DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION = 1111
 
 init()
 
@@ -125,7 +123,10 @@ function init() {
     }
   }
 
-  if (!preloadOnlyOnMousedown) {
+  if (preloadOnlyOnMousedown) {
+    document.addEventListener('touchstart', touchstartEmptyListener, eventListenersOptions)
+  }
+  else {
     document.addEventListener('touchstart', touchstartListener, eventListenersOptions)
   }
 
@@ -136,7 +137,6 @@ function init() {
   if (preloadOnMousedown) {
     document.addEventListener('mousedown', mousedownListener, eventListenersOptions)
   }
-
   if (useMousedownShortcut) {
     document.addEventListener('mousedown', mousedownShortcutListener, eventListenersOptions)
   }
@@ -178,10 +178,7 @@ function init() {
 }
 
 function touchstartListener(event) {
-  _lastTouchTimestamp = performance.now()
-  // Chrome on Android triggers mouseover before touchcancel, so
-  // `_lastTouchTimestamp` must be assigned on touchstart to be measured
-  // on mouseover.
+  _lastTouchstartEvent = event
 
   const anchorElement = event.target.closest('a')
 
@@ -192,8 +189,13 @@ function touchstartListener(event) {
   preload(anchorElement.href, 'high')
 }
 
+function touchstartEmptyListener(event) {
+  _lastTouchstartEvent = event
+}
+
 function mouseoverListener(event) {
-  if (performance.now() - _lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
+  if (isEventLikelyTriggeredByTouch(event)) {
+    // This avoids uselessly adding a mouseout event listener and setting a timer.
     return
   }
 
@@ -220,6 +222,15 @@ function mouseoverListener(event) {
 }
 
 function mousedownListener(event) {
+  if (isEventLikelyTriggeredByTouch(event)) {
+    // When preloading only on mousedown, not touch, we need to stop there
+    // because touches send compatibility mouse events including mousedown.
+    //
+    // (When preloading on touchstart, instructions below this block would
+    // have no effect.)
+    return
+  }
+
   const anchorElement = event.target.closest('a')
 
   if (!isPreloadable(anchorElement)) {
@@ -241,7 +252,11 @@ function mouseoutListener(event) {
 }
 
 function mousedownShortcutListener(event) {
-  if (performance.now() - _lastTouchTimestamp < DELAY_TO_NOT_BE_CONSIDERED_A_TOUCH_INITIATED_ACTION) {
+  if (isEventLikelyTriggeredByTouch(event)) {
+    // Due to a high potential for complications with this mousedown shortcut
+    // combined with other parties’ JavaScript code, we don’t want it to run
+    // at all on touch devices, even though mousedown and click are triggered
+    // at almost the same time on touch.
     return
   }
 
@@ -265,6 +280,57 @@ function mousedownShortcutListener(event) {
 
   const customEvent = new MouseEvent('click', {view: window, bubbles: true, cancelable: false, detail: 1337})
   anchorElement.dispatchEvent(customEvent)
+}
+
+function isEventLikelyTriggeredByTouch(event) {
+  // Touch devices fire “mouseover” and “mousedown” (and other) events after
+  // a touch for compatibility reasons.
+  // This function checks if it’s likely that we’re dealing with such an event.
+
+  if (!_lastTouchstartEvent || !event) {
+    return false
+  }
+
+  if (event.target != _lastTouchstartEvent.target) {
+    return false
+  }
+
+  const now = event.timeStamp
+  // Chromium (tested Chrome 95 and 122 on Android) sometimes uses the same
+  // event.timeStamp value in touchstart, mouseover, and mousedown.
+  // Testable in test/extras/delay-not-considered-touch.html
+  // This is okay for our purpose: two equivalent timestamps will be less
+  // than the max duration, which means they’re related events.
+  // TODO: fill/find Chromium bug
+  const durationBetweenLastTouchstartAndNow = now - _lastTouchstartEvent.timeStamp
+
+  const MAX_DURATION_TO_BE_CONSIDERED_TRIGGERED_BY_TOUCHSTART = 2500
+  // How long after a touchstart event can a simulated mouseover/mousedown event fire?
+  // /test/extras/delay-not-considered-touch.html tries to answer that question.
+  // I saw up to 1450 ms on an overwhelmed Samsung Galaxy S2.
+  // On the other hand, how soon can an unrelated mouseover event happen after an unrelated touchstart?
+  // Meaning the user taps a link, then grabs their pointing device and clicks another/the same link.
+  // That scenario could occur if a user taps a link, thinks it hasn’t worked, and thus fall back to their pointing device.
+  // I do that in about 1200 ms on a Chromebook. In which case this function returns a false positive.
+  // False positives are okay, as this function is only used to decide to abort handling mouseover/mousedown/mousedownShortcut.
+  // False negatives could lead to unforeseen state, particularly in mousedownShortcutListener.
+
+  return durationBetweenLastTouchstartAndNow < MAX_DURATION_TO_BE_CONSIDERED_TRIGGERED_BY_TOUCHSTART
+
+  // TODO: Investigate if pointer events could be used.
+  // https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pointerType
+
+  // TODO: Investigate if InputDeviceCapabilities could be used to make it
+  // less hacky on Chromium browsers.
+  // https://developer.mozilla.org/en-US/docs/Web/API/InputDeviceCapabilities_API
+  // https://wicg.github.io/input-device-capabilities/
+  // Needs careful reading of the spec and tests (notably, what happens with a
+  // mouse connected to an Android or iOS smartphone?) to make sure it’s solid.
+  // Also need to judge if WebKit could implement it differently, as they
+  // don’t mind doing when a spec gives room to interpretation.
+  // It seems to work well on Chrome on ChromeOS.
+
+  // TODO: Consider using event screen position as another heuristic.
 }
 
 function isPreloadable(anchorElement) {
