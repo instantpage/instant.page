@@ -76,11 +76,6 @@ function init() {
   _allowExternalLinks = 'instantAllowExternalLinks' in document.body.dataset
   _useWhitelist = 'instantWhitelist' in document.body.dataset
 
-  const eventListenersOptions = {
-    capture: true,
-    passive: true,
-  }
-
   let preloadOnMousedown = false
   let preloadOnlyOnMousedown = false
   let preloadWhenVisible = false
@@ -130,6 +125,11 @@ function init() {
     if (!isNaN(intensityAsInteger)) {
       _delayOnHover = intensityAsInteger
     }
+  }
+
+  const eventListenersOptions = {
+    capture: true,
+    passive: true,
   }
 
   if (preloadOnlyOnMousedown) {
