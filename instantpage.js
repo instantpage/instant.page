@@ -226,7 +226,7 @@ function mouseoverListener(event) {
 
   _mouseoverTimer = setTimeout(() => {
     preload(anchorElement.href, 'high')
-    _mouseoverTimer = undefined
+    _mouseoverTimer = null
   }, _delayOnHover)
 }
 
@@ -256,7 +256,7 @@ function mouseoutListener(event) {
 
   if (_mouseoverTimer) {
     clearTimeout(_mouseoverTimer)
-    _mouseoverTimer = undefined
+    _mouseoverTimer = null
   }
 }
 
