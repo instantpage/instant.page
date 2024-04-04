@@ -363,6 +363,12 @@ function isPreloadable(anchorElement) {
     return
   }
 
+  // If the href only contains "#", browsers will return empty string instead of "#" when checking anchorElement.hash,
+  // so we have to do an explicit check for it.
+  if (anchorElement.getAttribute('href') === '#') {
+    return;
+  }
+
   if (anchorElement.protocol == 'http:' && location.protocol == 'https:') {
     return
   }
