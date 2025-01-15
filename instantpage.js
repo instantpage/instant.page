@@ -13,30 +13,36 @@ let _chromiumMajorVersionInUserAgent = null
 init()
 
 function init() {
-  const supportCheckRelList = document.createElement('link').relList
-  const isSupported = supportCheckRelList.supports('prefetch')
-    && supportCheckRelList.supports('modulepreload')
-  // instant.page is meant to be loaded with <script type=module>
-  // (though sometimes webmasters load it as a regular script).
-  // So it’s normally executed (and must not cause JavaScript errors) in:
-  // - Chromium 61+
-  // - Gecko in Firefox 60+
-  // - WebKit in Safari 10.1+ (iOS 10.3+, macOS 10.10+)
-  //
-  // The check above used to check for IntersectionObserverEntry.isIntersecting
-  // but module scripts support implies this compatibility — except in Safari
-  // 10.1–12.0, but this prefetch check takes care of it.
-  //
-  // The modulepreload check is used to drop support for Firefox < 115 in order
-  // to lessen maintenance.
-  // This implies Safari 17+ (if it supported prefetch), if we ever support
-  // fetch()-based preloading for Safari we might want to OR that check with
-  // something that Safari 15.4 or 16.4 supports.
-  // Also implies Chromium 66+.
+  const supportChecksRelList = document.createElement('link').relList
 
-  if (!isSupported) {
+  const supportsPrefetch = supportChecksRelList.supports('prefetch')
+  if (!supportsPrefetch) {
     return
   }
+
+  const chromium100Check = 'throwIfAborted' in AbortSignal.prototype // Chromium 100+, Safari 15.4+, Firefox 97+
+  const firefox115AndSafari17_0Check = supportChecksRelList.supports('modulepreload') // Firefox 115+, Safari 17.0+, Chromium 66+
+  const safari15_4AndFirefox116Check = Intl.PluralRules && 'selectRange' in Intl.PluralRules.prototype // Safari 15.4+, Firefox 116+, Chromium 106+
+  const firefox115AndSafari15_4Check = firefox115AndSafari17_0Check || safari15_4AndFirefox116Check
+  const isBrowserSupported = chromium100Check && firefox115AndSafari15_4Check
+  if (!isBrowserSupported) {
+    return
+  }
+  // In order to lessen maintenance and unnoticed bugs we only support:
+  // - Chromium ⩾ 100 — UC Browser 14
+  // - Gecko as in Firefox ⩾ 115 — last version supported on Windows 7
+  // - WebKit as in Safari ⩾ 15.4 — last major WebKit version supported on iPhone 6s & 7
+  //
+  // WebKit doesn’t support prefetch anyway, but instant.page might
+  // eventually drop this requirement by providing an option for
+  // fetch()-based preloading.
+  //
+  // Additionally, instant.page should not cause JavaScript errors in:
+  // - Chromium ⩾ 61
+  // - Gecko as in Firefox ⩾ 60
+  // - WebKit as in Safari ⩾ 10.1 (iOS ⩾ 10.3 and macOS ⩾ 10.10)
+  // Browser engines older than that don’t support <script type=module>
+  // and thus don’t load instant.page at all.
 
   const handleVaryAcceptHeader = 'instantVaryAccept' in document.body.dataset || 'Shopify' in window
   // The `Vary: Accept` header when received in Chromium 79–109 makes prefetches
