@@ -1,4 +1,4 @@
-/*! instant.page v5.2.0 - (C) 2019-2024 Alexandre Dieulot - https://instant.page/license */
+/*! instant.page v5.2.0 - (C) 2019-2025 Alexandre Dieulot - https://instant.page/license */
 
 let _chromiumMajorVersionInUserAgent = null
   , _speculationRulesType
