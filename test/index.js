@@ -60,7 +60,7 @@ async function requestListener(req, res) {
     headers['Content-Type'] = 'text/javascript'
     content = jsContent
   }
-  else if (['click-test.js', 'form-options.js'].includes(pathString)) {
+  else if (['click-test.js', 'form-options.js', 'check-content-blocking.js'].includes(pathString)) {
     headers['Content-Type'] = 'text/javascript'
     const path = new URL(`client/${pathString}`, import.meta.url)
     content = await fs.readFile(path)
