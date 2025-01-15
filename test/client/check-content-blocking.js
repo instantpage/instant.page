@@ -1,10 +1,18 @@
 main()
 
 async function main() {
+  if (!supportsPerformanceResourceTimingTransferSizeMetrics()) {
+    return
+  }
   await pageFullyLoaded()
   if (!hasBeenFetched()) {
     showMessage()
   }
+}
+
+function supportsPerformanceResourceTimingTransferSizeMetrics() {
+  // False in Safari < 16.4
+  return 'encodedBodySize' in PerformanceResourceTiming.prototype
 }
 
 function pageFullyLoaded() {
